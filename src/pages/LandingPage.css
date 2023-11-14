@@ -6,8 +6,10 @@
 }
 .welcomePopover{
     position: absolute;
-    height: 500px;
-    width: 300px;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    width: fit-content;
     background-color: #F0DEC7;
     border:1px solid #00171F;
     z-index: 1;
@@ -15,4 +17,25 @@
     top:15%;
     transform: translate(-50%, 0);
     filter:drop-shadow(5px 5px)
+}
+
+.welcomePopover .title{
+    font-size: 32px;
+    font-weight: bold;
+    text-wrap: nowrap;
+    margin: 10px;
+}
+.welcomePopover p{
+    margin: 10px;
+    width: 400px;
+}
+.welcomePopover button{
+    width: 300px;
+    height:40px;
+    font-size: 20px;
+    background-color: #6EA4BF ;
+    margin: auto;
+}
+.welcomePopover button:hover{
+    background-color: #6eabbf;
 }

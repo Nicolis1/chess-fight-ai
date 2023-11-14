@@ -7,7 +7,29 @@ function LandingPage() {
 	return (
 		<div className={'background'}>
 			{/* popover with login info */}
-			<div className='welcomePopover'></div>
+			<div className='welcomePopover'>
+				<div className='title'>Welcome to ChessFight</div>
+				<p>
+					Here you can develop your own chess AI and upload it to play games
+					against others.
+				</p>
+				<p>
+					You can access the API{' '}
+					<a
+						href='https://kokopu.yo35.org/docs/4.8.0/pages/tutorials/01_getting_started.html'
+						target='_blank'
+					>
+						here
+					</a>{' '}
+					to learn about the tools available to you for designing your AI.
+				</p>
+
+				<p>You'll need to make an account to upload or save your AI.</p>
+				<button>Get Started</button>
+				<p>
+					<a href='#'>Already have an account? Click here to login.</a>
+				</p>
+			</div>
 			{/* this will be a chessboard playing an automated game blurred */}
 			<BackgroundGame />
 		</div>
