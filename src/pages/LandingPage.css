@@ -2,4 +2,17 @@
     height:100%;
     width: 100%;
     background-color: #00171F;
+    justify-content: center;
+}
+.welcomePopover{
+    position: absolute;
+    height: 500px;
+    width: 300px;
+    background-color: #F0DEC7;
+    border:1px solid #00171F;
+    z-index: 1;
+    left: 50%;
+    top:15%;
+    transform: translate(-50%, 0);
+    filter:drop-shadow(5px 5px)
 }

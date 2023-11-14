@@ -6,9 +6,10 @@ import Board from '../components/board/Board';
 function LandingPage() {
 	return (
 		<div className={'background'}>
+			{/* popover with login info */}
+			<div className='welcomePopover'></div>
 			{/* this will be a chessboard playing an automated game blurred */}
 			<BackgroundGame />
-			{/* popover with login info */}
 		</div>
 	);
 }
@@ -22,10 +23,13 @@ function BackgroundGame() {
 				position.play(
 					legalMoves[Math.floor(Math.random() * legalMoves.length)],
 				);
+				setPosition(new Position(position.fen()));
 			} else {
-				position.reset();
+				setPosition(
+					// new game FEN
+					new Position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'),
+				);
 			}
-			setPosition(new Position(position.fen()));
 		}, 900);
 	}, []);
 	return <Board position={position} extrasVisible={false} />;
