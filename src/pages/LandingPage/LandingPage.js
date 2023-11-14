@@ -1,9 +1,12 @@
-import './LandingPage.css';
 import { React, useEffect, useState } from 'react';
 import { Position } from 'kokopu';
-import Board from '../components/board/Board';
+import Board from '../../components/board/Board';
+import './LandingPage.css';
+import { useDispatch } from 'react-redux';
+import { PAGES, setPage } from '../../data/features/activePageSlice';
 
 function LandingPage() {
+	const dispatch = useDispatch();
 	return (
 		<div className={'background'}>
 			{/* popover with login info */}
@@ -25,7 +28,13 @@ function LandingPage() {
 				</p>
 
 				<p>You'll need to make an account to upload or save your AI.</p>
-				<button>Get Started</button>
+				<button
+					onClick={() => {
+						dispatch(setPage(PAGES.EditorPage));
+					}}
+				>
+					Get Started
+				</button>
 				<p>
 					<a href='#'>Already have an account? Click here to login.</a>
 				</p>
