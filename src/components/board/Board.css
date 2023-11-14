@@ -1,0 +1,6 @@
+.board{
+    display: flex;
+    filter:blur(4px);
+    padding: 10px;
+    justify-content: center;
+}
