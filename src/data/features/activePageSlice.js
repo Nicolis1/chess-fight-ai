@@ -5,7 +5,7 @@ export const PAGES = {
 	EditorPage: 'EDITOR_PAGE',
 };
 
-export const counterSlice = createSlice({
+export const activePageSlice = createSlice({
 	name: 'page',
 	initialState: {
 		value: PAGES.LandingPage,
@@ -18,6 +18,6 @@ export const counterSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setPage } = counterSlice.actions;
+export const { setPage } = activePageSlice.actions;
 
-export default counterSlice.reducer;
+export default activePageSlice.reducer;
