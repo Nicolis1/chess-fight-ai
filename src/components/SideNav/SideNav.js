@@ -12,7 +12,6 @@ export default function SideNav(props) {
 			<div className='container'>
 				{!collapsed && <div className='navEntries'></div>}
 				<Button
-					className='button'
 					icon={collapsed ? 'icon-arrow-right' : 'icon-arrow-left'}
 					onClick={toggleCollapse}
 				/>

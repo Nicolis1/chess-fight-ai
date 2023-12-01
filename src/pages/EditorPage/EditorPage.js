@@ -7,7 +7,10 @@ function EditorPage() {
 	return (
 		<div className='container'>
 			<SideNav />
-			<div className='editor'></div>
+			<div className='editor'>
+				<div className='titleBar'>Untitled</div>
+				<div className='codeEditor'> </div>
+			</div>
 			<div className='debugger'>
 				<div className='gameVisualization'></div>
 				<div className='testOutput'></div>
