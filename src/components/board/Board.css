@@ -3,4 +3,5 @@
     filter:blur(4px);
     padding: 10px;
     justify-content: center;
+    filter:brightness(50%);
 }

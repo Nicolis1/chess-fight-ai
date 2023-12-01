@@ -58,7 +58,7 @@ function BackgroundGame() {
 			} else {
 				setPosition(
 					// new game FEN
-					new Position('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'),
+					new Position(),
 				);
 			}
 		}, 900);
