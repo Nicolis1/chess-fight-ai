@@ -3,7 +3,7 @@
     background-color: green;
     display: flex;
     flex-direction: column;
-    transition: 0.5s; /* You can adjust the transition duration */
+    transition: 0.5s; 
 }
 .sideNav.collapsed{
     width: 40px;
