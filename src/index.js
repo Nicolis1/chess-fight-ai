@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 import { Provider } from 'react-redux';
 import activePage from './data/stores/activePageStore';
+import 'simple-line-icons/css/simple-line-icons.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

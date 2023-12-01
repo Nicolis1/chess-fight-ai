@@ -1,0 +1,20 @@
+.sideNav{
+    height: 100%;
+    background-color: green;
+    display: flex;
+    flex-direction: column;
+    transition: 0.5s; /* You can adjust the transition duration */
+}
+.sideNav.collapsed{
+    width: 40px;
+}
+.expanded{
+    width:300px;
+}
+.navEntries{
+    flex-grow: 100;
+}
+.container{
+    display: flex;
+    align-items: center;
+}
