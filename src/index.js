@@ -5,13 +5,14 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { Provider } from 'react-redux';
-import activePage from './data/stores/activePageStore';
+import dataStore from './data/stores/dataStore';
+
 import 'simple-line-icons/css/simple-line-icons.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<React.StrictMode>
-		<Provider store={activePage}>
+		<Provider store={dataStore}>
 			<App />
 		</Provider>
 	</React.StrictMode>,

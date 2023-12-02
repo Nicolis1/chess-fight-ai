@@ -1,17 +1,26 @@
 import { React, useEffect, useState } from 'react';
 import './EditorPage.css';
 import SideNav from '../../components/SideNav/SideNav';
-import Editor from '@monaco-editor/react';
+
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { useSelector } from 'react-redux';
 
 function EditorPage() {
-	const code = 'console.log("Hello, Monaco Editor!");';
+	const activeCode = useSelector((state) => state.activeCode.value);
+
 	return (
 		<div className='container'>
 			<SideNav />
 			<div className='editorSection'>
 				<div className='titleBar'>Untitled</div>
 				<div className='editorWrapper'>
-					<Editor defaultLanguage='javascript' defaultValue={code} />
+					<CodeMirror
+						value={activeCode}
+						extensions={[javascript({ jsx: false })]}
+						onChange={() => {}}
+						height='900px'
+					/>
 				</div>
 			</div>
 			<div className='debugger'>

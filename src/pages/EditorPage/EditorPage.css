@@ -4,20 +4,17 @@
     height: 100%;
 }
 .editorSection{
-    height:100%;
     flex-grow: 100;
-    background-color: #F0DEC7;
-
-    flex-direction: row;
-}
-.editorWrapper{
+    background-color: #F0DEC7; 
     height: 100%;
+    overflow-y: hidden;
 }
+
 .titleBar{
     height:30px;
     padding: 10px;
     font-weight: bold;
-    box-shadow: 0px 10px 5px 0px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid black;
 
 }
 .debugger{
