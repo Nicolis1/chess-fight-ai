@@ -1,7 +1,4 @@
 .board{
-    display: flex;
-    filter:blur(4px);
-    padding: 10px;
-    justify-content: center;
-    filter:brightness(50%);
+    height:100%;
+    width: 100%;
 }

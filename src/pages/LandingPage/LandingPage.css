@@ -1,8 +1,13 @@
+body{
+    margin:0;
+}
 .background{
-    height:100%;
-    width: 100%;
     background-color: #00171F;
+    display: flex;
     justify-content: center;
+    height: 100%;
+    width:100%;
+
     
 }
 .welcomePopover{
@@ -39,4 +44,13 @@
 }
 .welcomePopover button:hover{
     background-color: #6eabbf;
+}
+.gameBoard{
+    filter:brightness(50%);
+    filter:blur(4px);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    height:75%;
+    width:75%;
 }

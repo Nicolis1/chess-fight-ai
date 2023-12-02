@@ -15,10 +15,23 @@
     padding: 10px;
     font-weight: bold;
     border-bottom: 1px solid black;
-
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.editorButtons{
+    display: flex;
+    flex-direction: row;
+}
+.editorButtons *{
+    padding: 5px;
 }
 .debugger{
     width:30%;
     height:100%;
     background-color: orange;
+}
+.gameVisualization{
+    height: 50%;
+    width:100%;
 }

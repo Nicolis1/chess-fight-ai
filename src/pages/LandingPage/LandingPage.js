@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from 'react';
-import { Position } from 'kokopu';
+import { Chess } from 'chess.js';
 import Board from '../../components/board/Board';
 import './LandingPage.css';
 import { useDispatch } from 'react-redux';
@@ -18,10 +18,7 @@ function LandingPage() {
 				</p>
 				<p>
 					You can access the API{' '}
-					<a
-						href='https://kokopu.yo35.org/docs/4.8.0/pages/tutorials/01_getting_started.html'
-						target='_blank'
-					>
+					<a href='https://www.npmjs.com/package/chess.js' target='_blank'>
 						here
 					</a>{' '}
 					to learn about the tools available to you for designing your AI.
@@ -40,30 +37,29 @@ function LandingPage() {
 				</p>
 			</div>
 			{/* this will be a chessboard playing an automated game blurred */}
-			<BackgroundGame />
+			<div className='gameBoard'>
+				<BackgroundGame />
+			</div>
 		</div>
 	);
 }
 
 function BackgroundGame() {
-	let [position, setPosition] = useState(new Position());
+	const chess = new Chess();
+	let [fen, setFen] = useState(chess.fen());
+
 	useEffect(() => {
 		setInterval(() => {
-			if (position.hasMove()) {
-				const legalMoves = position.moves();
-				position.play(
-					legalMoves[Math.floor(Math.random() * legalMoves.length)],
-				);
-				setPosition(new Position(position.fen()));
+			if (!chess.isGameOver() && !chess.isInsufficientMaterial()) {
+				const legalMoves = chess.moves();
+				chess.move(legalMoves[Math.floor(Math.random() * legalMoves.length)]);
 			} else {
-				setPosition(
-					// new game FEN
-					new Position(),
-				);
+				chess.reset();
 			}
+			setFen(chess.fen());
 		}, 900);
 	}, []);
-	return <Board position={position} extrasVisible={false} />;
+	return <Board position={fen} />;
 }
 
 export default LandingPage;

@@ -11,11 +11,9 @@ import 'simple-line-icons/css/simple-line-icons.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-	<React.StrictMode>
-		<Provider store={dataStore}>
-			<App />
-		</Provider>
-	</React.StrictMode>,
+	<Provider store={dataStore}>
+		<App />
+	</Provider>,
 );
 
 // If you want to start measuring performance in your app, pass a function

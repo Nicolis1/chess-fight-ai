@@ -8,7 +8,7 @@ export const PAGES = {
 export const activePageSlice = createSlice({
 	name: 'page',
 	initialState: {
-		value: PAGES.EditorPage,
+		value: PAGES.LandingPage,
 	},
 	reducers: {
 		setPage: (state, action) => {

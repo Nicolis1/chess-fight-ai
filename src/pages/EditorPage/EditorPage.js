@@ -5,6 +5,8 @@ import SideNav from '../../components/SideNav/SideNav';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { useSelector } from 'react-redux';
+import Button from '../../components/Button/Button';
+import Board from '../../components/board/Board';
 
 function EditorPage() {
 	const activeCode = useSelector((state) => state.activeCode.value);
@@ -13,7 +15,13 @@ function EditorPage() {
 		<div className='container'>
 			<SideNav />
 			<div className='editorSection'>
-				<div className='titleBar'>Untitled</div>
+				<div className='titleBar'>
+					<div>Untitled</div>
+					<div className='editorButtons'>
+						<Button icon='icon-control-play' onClick={() => {}}></Button>
+						<Button icon='icon-rocket' onClick={() => {}}></Button>
+					</div>
+				</div>
 				<div className='editorWrapper'>
 					<CodeMirror
 						value={activeCode}
@@ -24,7 +32,9 @@ function EditorPage() {
 				</div>
 			</div>
 			<div className='debugger'>
-				<div className='gameVisualization'></div>
+				<div className='gameVisualization'>
+					{/* <Board position={new Position()} extrasVisible={false}></Board> */}
+				</div>
 				<div className='testOutput'></div>
 			</div>
 		</div>
