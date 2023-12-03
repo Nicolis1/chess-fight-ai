@@ -27,15 +27,18 @@
 .editorButtons *{
     padding: 5px;
 }
+.react-tooltip{
+    z-index: 5;
+}
 .debugger{
-    width:30%;
+    width:fit-content;
     height:100%;
     display: flex;
     flex-direction: column;
     background-color: #F0DEC7;
 }
 .gameVisualization{
-    width:100%;
+    width:300px;
     height: fit-content;
     border-bottom: 1px solid black;
 }

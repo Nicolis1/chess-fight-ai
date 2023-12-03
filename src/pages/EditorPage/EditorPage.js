@@ -9,6 +9,7 @@ import Board from '../../components/board/Board';
 import { Chess } from 'chess.js';
 import { STARTER_CODE, simulateGames } from '../../data/utils';
 import TestResults from '../../components/TestResults/TestResultsTable';
+import { Tooltip } from 'react-tooltip';
 
 function EditorPage() {
 	// const activeCode = useSelector((state) => state.activeCode.value);
@@ -52,13 +53,26 @@ function EditorPage() {
 
 	return (
 		<div className='container'>
+			<Tooltip id='editor-button-run' />
+			<Tooltip id='editor-button-submit' />
+
 			<SideNav />
 			<div className='editorSection'>
 				<div className='titleBar'>
 					<div>Untitled</div>
 					<div className='editorButtons'>
-						<Button icon='icon-control-play' onClick={runCode}></Button>
-						<Button icon='icon-rocket' onClick={() => {}}></Button>
+						<Button
+							icon='icon-control-play'
+							onClick={runCode}
+							tooltipID={'editor-button-run'}
+							tooltipContent={'Run'}
+						/>
+						<Button
+							icon='icon-rocket'
+							onClick={() => {}}
+							tooltipID={'editor-button-submit'}
+							tooltipContent={'Submit'}
+						/>
 					</div>
 				</div>
 				<div className='editorWrapper'>

@@ -4,7 +4,12 @@ import './Button.css';
 export default function Button(props) {
 	return (
 		<div className='icon' onClick={props.onClick}>
-			<i className={props.icon} />
+			<a
+				data-tooltip-content={props.tooltipContent}
+				data-tooltip-id={props.tooltipID}
+			>
+				<i className={props.icon} />
+			</a>
 		</div>
 	);
 }

@@ -7,8 +7,6 @@ body{
     justify-content: center;
     height: 100%;
     width:100%;
-
-    
 }
 .welcomePopover{
     position: absolute;
@@ -22,17 +20,19 @@ body{
     left: 50%;
     top:15%;
     transform: translate(-50%, 0);
-    filter:drop-shadow(5px 5px)
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
+
 }
 
 .welcomePopover .title{
     font-size: 32px;
     font-weight: bold;
     text-wrap: nowrap;
-    margin: 10px;
+    padding: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 .welcomePopover p{
-    margin: 10px;
+    padding-left: 5px;
     width: 400px;
 }
 .welcomePopover button{
@@ -46,11 +46,12 @@ body{
     background-color: #6eabbf;
 }
 .gameBoard{
-    filter:brightness(50%);
-    filter:blur(4px);
+    filter:brightness(70%) blur(4px);
     padding: 10px;
     display: flex;
-    justify-content: center;
-    height:75%;
-    width:75%;
+    justify-self: center;
+    align-self: center;
+    width:700px;
+    height: fit-content;
+    border-bottom: 1px solid black;
 }
