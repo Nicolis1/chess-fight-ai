@@ -4,12 +4,12 @@ import './TestResult.css';
 function TestResult(props) {
 	const [showDetails, setShowDetails] = useState(false);
 	let outcome = null;
-	if (props.data.winner == 'w') {
-		outcome = 'White';
-	} else if (props.data.winner == 'b') {
-		outcome = 'Black';
-	} else {
+	if (props.data.reachedMoveLimit || props.data.draw) {
 		outcome = 'Draw';
+	} else if (props.data.winner === true) {
+		outcome = 'Win';
+	} else if (props.data.winner === false) {
+		outcome = 'Loss';
 	}
 
 	const playMoves = useCallback(() => {
@@ -27,6 +27,7 @@ function TestResult(props) {
 					className='detailsLink'
 					onClick={() => {
 						setShowDetails(!showDetails);
+						console.log(props.data.winner);
 					}}
 				>
 					details
@@ -34,10 +35,12 @@ function TestResult(props) {
 			</div>
 			{showDetails && (
 				<div>
-					<a className='playMoves' onClick={playMoves}>
-						Play Moves
-					</a>
-					<div>{props.data.moves}</div>
+					<div>
+						with the {props.data.playerColor === 'w' ? 'white' : 'black'} pieces{' '}
+						<a className='playMoves' onClick={playMoves}>
+							Play Moves
+						</a>
+					</div>
 				</div>
 			)}
 		</div>
@@ -57,7 +60,7 @@ export default function TestResults(props) {
 		});
 		return (
 			<div>
-				<div className='resultsTitle'>Results</div>
+				<div className='resultsTitle'>Results vs {props.response.opponent}</div>
 				{resultComponents}
 			</div>
 		);
