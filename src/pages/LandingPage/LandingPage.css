@@ -55,3 +55,7 @@ body{
     height: fit-content;
     border-bottom: 1px solid black;
 }
+.login-container{
+    display: flex;
+    flex-direction: column;
+}
