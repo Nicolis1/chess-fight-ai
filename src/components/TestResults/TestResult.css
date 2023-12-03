@@ -27,19 +27,19 @@
 
 /** generated styles from chatgpt */
 /* Styles for normal link */
-a.link {
+.debugger a {
   color: #007bff; /* Link color */
   text-decoration: none; /* Remove default underline */
 }
 
 /* Styles for a link on hover */
-a:hover.link {
+.debugger a:hover {
   color: #0056b3; /* Link color on hover */
   text-decoration: underline; /* Underline on hover */
   cursor: pointer;
 }
 
 /* Styles for a link when clicked */
-a:active.link {
+.debugger a:active {
   color: #0056b3; /* Link color when clicked */
 }

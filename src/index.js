@@ -12,7 +12,9 @@ import 'simple-line-icons/css/simple-line-icons.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<Provider store={dataStore}>
-		<App />
+		<React.StrictMode>
+			<App />
+		</React.StrictMode>
 	</Provider>,
 );
 

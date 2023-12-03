@@ -50,7 +50,7 @@ function BackgroundGame() {
 	useEffect(() => {
 		const chess = new Chess();
 		setFen(chess.fen());
-		setInterval(() => {
+		const intervalID = setInterval(() => {
 			if (!chess.isGameOver() && !chess.isInsufficientMaterial()) {
 				const legalMoves = chess.moves();
 				chess.move(legalMoves[Math.floor(Math.random() * legalMoves.length)]);
@@ -59,6 +59,10 @@ function BackgroundGame() {
 			}
 			setFen(chess.fen());
 		}, 900);
+
+		return () => {
+			clearInterval(intervalID);
+		};
 	}, []);
 	return <Board position={fen} />;
 }
