@@ -1,0 +1,42 @@
+.testResult{
+    border: 1px solid black;
+}
+.resultContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+   
+}
+.playMoves{
+    color: #6eabbf;
+}
+.White{
+    color: green;
+}
+.Black{
+    color:red;
+}
+.Draw{
+    color:darkgoldenrod
+}
+.detailsLink{
+    padding-right: 4px;
+}
+/** generated styles from chatgpt */
+/* Styles for normal link */
+a {
+  color: #007bff; /* Link color */
+  text-decoration: none; /* Remove default underline */
+}
+
+/* Styles for a link on hover */
+a:hover {
+  color: #0056b3; /* Link color on hover */
+  text-decoration: underline; /* Underline on hover */
+  cursor: pointer;
+}
+
+/* Styles for a link when clicked */
+a:active {
+  color: #0056b3; /* Link color when clicked */
+}

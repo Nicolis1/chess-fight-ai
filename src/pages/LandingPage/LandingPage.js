@@ -45,10 +45,11 @@ function LandingPage() {
 }
 
 function BackgroundGame() {
-	const chess = new Chess();
-	let [fen, setFen] = useState(chess.fen());
+	let [fen, setFen] = useState(null);
 
 	useEffect(() => {
+		const chess = new Chess();
+		setFen(chess.fen());
 		setInterval(() => {
 			if (!chess.isGameOver() && !chess.isInsufficientMaterial()) {
 				const legalMoves = chess.moves();

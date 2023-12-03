@@ -5,7 +5,7 @@
 }
 .editorSection{
     flex-grow: 100;
-    background-color: #F0DEC7; 
+    background-color:#B58864 ; 
     height: 100%;
     overflow-y: hidden;
     border-right:1px solid black;
@@ -30,9 +30,16 @@
 .debugger{
     width:30%;
     height:100%;
-    background-color: orange;
+    display: flex;
+    flex-direction: column;
+    background-color: #F0DEC7;
 }
 .gameVisualization{
-    height: 50%;
     width:100%;
+    height: fit-content;
+    border-bottom: 1px solid black;
+}
+.testOutput{
+   flex-grow: 100;
+   overflow: scroll;
 }
