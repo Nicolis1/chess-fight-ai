@@ -7,35 +7,39 @@ import { javascript } from '@codemirror/lang-javascript';
 import Button from '../../components/Button/Button';
 import Board from '../../components/board/Board';
 import { Chess } from 'chess.js';
-import { STARTER_CODE, simulateGames } from '../../data/utils';
+import { simulateGames } from '../../data/utils';
 import TestResults from '../../components/TestResults/TestResultsTable';
 import { Tooltip } from 'react-tooltip';
 import { useSelector } from 'react-redux';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { firestore } from '../../firebase/firebase';
+import { firestore, auth } from '../../firebase/firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function EditorPage() {
 	const activeCodeID = useSelector((state) => state.activeCode.value);
-	const [activeCodeLocal, setActiveCode] = useState(STARTER_CODE);
 	const [results, setResults] = useState(null);
 	const [calculating, setCalculating] = useState(false);
 	const [displayFen, setDisplayFen] = useState(new Chess().fen());
 	const [intervalID, setIntervalID] = useState(null);
-	const [botID, setBotID] = useState(null);
-	const [userID, setUserID] = useState(null);
+	const [user] = useAuthState(auth);
+	const [botData, setBotData] = useState({});
 
 	useEffect(() => {
 		(async () => {
 			if (activeCodeID) {
 				try {
-					const docRef = doc(firestore, 'bots', activeCodeID);
+					const docRef = doc(
+						firestore,
+						'users',
+						user.uid,
+						'bots',
+						activeCodeID,
+					);
 					const docSnap = await getDoc(docRef);
 					if (docSnap.exists()) {
 						const data = docSnap.data();
 						console.log('Document data:', data);
-						setActiveCode(data.code);
-						setBotID(data.botID);
-						setUserID(data.owner);
+						setBotData(data);
 					} else {
 						// docSnap.data() will be undefined in this case
 						console.log('No such document!');
@@ -46,10 +50,10 @@ function EditorPage() {
 				}
 			}
 		})();
-	}, [activeCodeID]);
+	}, [activeCodeID, user]);
 
 	const onChange = useCallback((code) => {
-		setActiveCode(code);
+		setBotData({ ...botData, code });
 	});
 
 	const finishSimulation = useCallback((results) => {
@@ -57,17 +61,25 @@ function EditorPage() {
 		setResults(results);
 	});
 	const runCode = useCallback(() => {
-		setCalculating(true);
-		const decisionFunction = new Function('position', activeCodeLocal);
-		simulateGames(decisionFunction, finishSimulation);
+		if (botData.code != null) {
+			setCalculating(true);
+			const decisionFunction = new Function('position', botData.code);
+			simulateGames(decisionFunction, finishSimulation);
+		} else {
+			alert('Nothing to run');
+		}
 	});
 	const submitChanges = useCallback(async () => {
-		await setDoc(doc(firestore, 'bots', activeCodeID), {
-			name: 'Untitled',
-			owner: userID,
-			code: activeCodeLocal,
-			botID: botID,
-		});
+		if (botData.code != null && botData.botID != null && botData.name != null) {
+			setDoc(doc(firestore, 'users', user.uid, 'bots', activeCodeID), {
+				name: 'Untitled',
+				owner: user.uid,
+				code: botData.code,
+				botID: botData.botID,
+			});
+		} else {
+			alert('Nothing to save');
+		}
 	});
 	const playMoves = useCallback((moves) => {
 		const movesClone = [...moves];
@@ -113,7 +125,7 @@ function EditorPage() {
 				</div>
 				<div className='editorWrapper'>
 					<CodeMirror
-						value={activeCodeLocal}
+						value={botData.code}
 						extensions={[javascript({ jsx: false })]}
 						onChange={onChange}
 						height='900px'

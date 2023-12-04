@@ -20,6 +20,9 @@ export default function SignoutButton() {
 					alert(error.message);
 				}
 			}}
-		/>
+		>
+			{' '}
+			Sign Out
+		</Button>
 	);
 }

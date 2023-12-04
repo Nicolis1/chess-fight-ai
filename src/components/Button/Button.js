@@ -9,6 +9,7 @@ export default function Button(props) {
 				data-tooltip-id={props.tooltipID}
 			>
 				<i className={props.icon} />
+				{props.children}
 			</a>
 		</div>
 	);

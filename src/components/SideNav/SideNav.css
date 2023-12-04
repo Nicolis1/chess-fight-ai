@@ -12,8 +12,10 @@
 .expanded{
     width:300px;
 }
-.navEntries{
-    flex-grow: 100;
+.sideNavContent{
+    width:100%;
+    border-right: 1px solid black;
 }
+
 
 
