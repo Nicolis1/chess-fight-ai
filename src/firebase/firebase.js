@@ -3,7 +3,7 @@ import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
+// TODO env local isn't working for some reason, these will need to change before publishing @nocommit
 const firebaseConfig = {
 	apiKey: 'AIzaSyCYtz0ifl3Eh-B_zSoOz1jXmLLmEYVbc1o',
 	authDomain: 'chessfight-5257b.firebaseapp.com',
@@ -16,6 +16,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// const firestore = getFirestore(auth);
+const firestore = getFirestore(app);
 
-export { auth, app };
+export { auth, firestore, app };

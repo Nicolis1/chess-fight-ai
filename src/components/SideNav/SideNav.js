@@ -2,6 +2,7 @@ import { React, useCallback, useState } from 'react';
 import './SideNav.css';
 import Button from '../Button/Button';
 import SignoutButton from '../Button/SignoutButton';
+import NewBot from '../Button/NewBot';
 
 export default function SideNav(props) {
 	const [collapsed, setCollapsed] = useState(true);
@@ -14,6 +15,7 @@ export default function SideNav(props) {
 				{!collapsed && (
 					<div className='navEntries'>
 						<SignoutButton />
+						<NewBot />
 					</div>
 				)}
 				<Button

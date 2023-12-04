@@ -10,14 +10,38 @@ import { Chess } from 'chess.js';
 import { STARTER_CODE, simulateGames } from '../../data/utils';
 import TestResults from '../../components/TestResults/TestResultsTable';
 import { Tooltip } from 'react-tooltip';
+import { useSelector } from 'react-redux';
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '../../firebase/firebase';
 
 function EditorPage() {
-	// const activeCode = useSelector((state) => state.activeCode.value);
+	const activeCodeID = useSelector((state) => state.activeCode.value);
 	const [activeCodeLocal, setActiveCode] = useState(STARTER_CODE);
 	const [results, setResults] = useState(null);
 	const [calculating, setCalculating] = useState(false);
 	const [displayFen, setDisplayFen] = useState(new Chess().fen());
 	const [intervalID, setIntervalID] = useState(null);
+
+	useEffect(() => {
+		(async () => {
+			if (activeCodeID) {
+				try {
+					const docRef = doc(firestore, 'bots', activeCodeID);
+					const docSnap = await getDoc(docRef);
+					if (docSnap.exists()) {
+						console.log('Document data:', docSnap.data());
+						setActiveCode(docSnap.data().code);
+					} else {
+						// docSnap.data() will be undefined in this case
+						console.log('No such document!');
+					}
+				} catch (error) {
+					console.error(error);
+					alert(error.message);
+				}
+			}
+		})();
+	}, [activeCodeID]);
 
 	const onChange = useCallback((code) => {
 		setActiveCode(code);
