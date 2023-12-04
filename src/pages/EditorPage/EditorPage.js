@@ -11,7 +11,7 @@ import { STARTER_CODE, simulateGames } from '../../data/utils';
 import TestResults from '../../components/TestResults/TestResultsTable';
 import { Tooltip } from 'react-tooltip';
 import { useSelector } from 'react-redux';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { firestore } from '../../firebase/firebase';
 
 function EditorPage() {
@@ -21,6 +21,8 @@ function EditorPage() {
 	const [calculating, setCalculating] = useState(false);
 	const [displayFen, setDisplayFen] = useState(new Chess().fen());
 	const [intervalID, setIntervalID] = useState(null);
+	const [botID, setBotID] = useState(null);
+	const [userID, setUserID] = useState(null);
 
 	useEffect(() => {
 		(async () => {
@@ -29,8 +31,11 @@ function EditorPage() {
 					const docRef = doc(firestore, 'bots', activeCodeID);
 					const docSnap = await getDoc(docRef);
 					if (docSnap.exists()) {
-						console.log('Document data:', docSnap.data());
-						setActiveCode(docSnap.data().code);
+						const data = docSnap.data();
+						console.log('Document data:', data);
+						setActiveCode(data.code);
+						setBotID(data.botID);
+						setUserID(data.owner);
 					} else {
 						// docSnap.data() will be undefined in this case
 						console.log('No such document!');
@@ -52,10 +57,17 @@ function EditorPage() {
 		setResults(results);
 	});
 	const runCode = useCallback(() => {
-		//TODO move this to backend
 		setCalculating(true);
 		const decisionFunction = new Function('position', activeCodeLocal);
 		simulateGames(decisionFunction, finishSimulation);
+	});
+	const submitChanges = useCallback(async () => {
+		await setDoc(doc(firestore, 'bots', activeCodeID), {
+			name: 'Untitled',
+			owner: userID,
+			code: activeCodeLocal,
+			botID: botID,
+		});
 	});
 	const playMoves = useCallback((moves) => {
 		const movesClone = [...moves];
@@ -93,7 +105,7 @@ function EditorPage() {
 						/>
 						<Button
 							icon='icon-rocket'
-							onClick={() => {}}
+							onClick={submitChanges}
 							tooltipID={'editor-button-submit'}
 							tooltipContent={'Submit'}
 						/>

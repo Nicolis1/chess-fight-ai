@@ -3,8 +3,8 @@ import { auth, firestore } from '../../firebase/firebase';
 import { useDispatch } from 'react-redux';
 
 import Button from './Button';
-import { doc, setDoc } from 'firebase/firestore';
 import { STARTER_CODE2 } from '../../data/utils';
+import { doc, setDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { setActiveCodeID } from '../../data/features/activeCodeSlice';
 
