@@ -1,11 +1,10 @@
 import { React, useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { firestore, auth } from '../../firebase/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { setActiveCodeID } from '../../data/features/activeCodeSlice';
 import { useDispatch } from 'react-redux';
 import Button from '../Button/Button';
-import NewBot from '../Button/NewBot';
 import { useSelector } from 'react-redux';
 
 export default function BotSelections(props) {
@@ -60,7 +59,6 @@ export default function BotSelections(props) {
 					</Button>
 				);
 			})}
-			<NewBot />
 		</>
 	);
 }

@@ -16,6 +16,8 @@ export const STARTER_CODE =
 	your result must be a string like "a3" that appears
 	in the list of position.moves() */
 	let moves = position.moves();
+
+
 	for(let move of moves){
 		position.move(move);
 		let isMate = position.isCheckmate();

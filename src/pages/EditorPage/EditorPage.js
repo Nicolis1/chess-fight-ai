@@ -1,4 +1,4 @@
-import { React, useCallback, useEffect, useState } from 'react';
+import { React, useEffect, useState } from 'react';
 import './EditorPage.css';
 import SideNav from '../../components/SideNav/SideNav';
 
@@ -23,6 +23,8 @@ function EditorPage() {
 	const [intervalID, setIntervalID] = useState(null);
 	const [user] = useAuthState(auth);
 	const [botData, setBotData] = useState({});
+	const [editingTitle, setEditingTitle] = useState(false);
+	const [hoveringTitle, setHoveringTitle] = useState(false);
 
 	useEffect(() => {
 		(async () => {
@@ -52,27 +54,29 @@ function EditorPage() {
 		})();
 	}, [activeCodeID, user]);
 
-	const onChange = useCallback((code) => {
+	const onChange = (code) => {
 		setBotData({ ...botData, code });
-	});
+	};
 
-	const finishSimulation = useCallback((results) => {
+	const finishSimulation = (results) => {
 		setCalculating(false);
 		setResults(results);
-	});
-	const runCode = useCallback(() => {
+	};
+	const runCode = () => {
 		if (botData.code != null) {
 			setCalculating(true);
+			// new Function call's eval on user submitted code, this is potentially dangerous
+			// eslint-disable-next-line no-new-func
 			const decisionFunction = new Function('position', botData.code);
 			simulateGames(decisionFunction, finishSimulation);
 		} else {
 			alert('Nothing to run');
 		}
-	});
-	const submitChanges = useCallback(async () => {
+	};
+	const submitChanges = async () => {
 		if (botData.code != null && botData.botID != null && botData.name != null) {
 			setDoc(doc(firestore, 'users', user.uid, 'bots', activeCodeID), {
-				name: 'Untitled',
+				name: botData.name,
 				owner: user.uid,
 				code: botData.code,
 				botID: botData.botID,
@@ -80,8 +84,8 @@ function EditorPage() {
 		} else {
 			alert('Nothing to save');
 		}
-	});
-	const playMoves = useCallback((moves) => {
+	};
+	const playMoves = (moves) => {
 		const movesClone = [...moves];
 		if (intervalID != null) {
 			clearInterval(intervalID);
@@ -97,7 +101,7 @@ function EditorPage() {
 			setDisplayFen(game.fen());
 		}, 100);
 		setIntervalID(id);
-	});
+	};
 
 	return (
 		<div className='container'>
@@ -106,8 +110,41 @@ function EditorPage() {
 
 			<SideNav />
 			<div className='editorSection'>
-				<div className='titleBar'>
-					<div>Untitled</div>
+				<div
+					className='titleBar'
+					onMouseEnter={() => {
+						setHoveringTitle(true);
+					}}
+					onMouseLeave={() => {
+						setHoveringTitle(false);
+					}}
+				>
+					{editingTitle ? (
+						<input
+							className='displayTitle'
+							type='text'
+							value={botData.name}
+							placeholder='Untitled Bot'
+							onChange={(e) => {
+								setBotData({ ...botData, name: e.target.value });
+							}}
+							onBlur={() => {
+								setEditingTitle(false);
+							}}
+							autoFocus={true}
+						/>
+					) : (
+						<div
+							className='displayTitle'
+							onClick={() => {
+								setEditingTitle(true);
+							}}
+						>
+							<span>{botData.name}</span>
+							{hoveringTitle && <Button icon={'icon-pencil'} />}
+						</div>
+					)}
+
 					<div className='editorButtons'>
 						<Button
 							icon='icon-control-play'

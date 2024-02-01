@@ -14,7 +14,7 @@ function TestResult(props) {
 
 	const playMoves = useCallback(() => {
 		props.playMoves(props.data.moves);
-	}, [props.data.moves, props.playMoves]);
+	}, [props]);
 
 	return (
 		<div className='testResult'>
@@ -23,7 +23,7 @@ function TestResult(props) {
 					<span className={outcome}>{outcome}</span> in{' '}
 					{`${props.data.turns} moves`}
 				</div>
-				<a
+				<button
 					className='detailsLink'
 					onClick={() => {
 						setShowDetails(!showDetails);
@@ -31,15 +31,15 @@ function TestResult(props) {
 					}}
 				>
 					details
-				</a>
+				</button>
 			</div>
 			{showDetails && (
 				<div>
 					<div>
 						with the {props.data.playerColor === 'w' ? 'white' : 'black'} pieces{' '}
-						<a className='playMoves' onClick={playMoves}>
+						<button className='playMoves' onClick={playMoves}>
 							Play Moves
-						</a>
+						</button>
 					</div>
 				</div>
 			)}

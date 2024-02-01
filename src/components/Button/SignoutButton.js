@@ -3,8 +3,9 @@ import { auth } from '../../firebase/firebase';
 import { useDispatch } from 'react-redux';
 import { PAGES, setPage } from '../../data/features/activePageSlice';
 import Button from './Button';
-export default function SignoutButton() {
-	const [signOut, loading, error] = useSignOut(auth);
+export default function SignoutButton({ withText }) {
+	const [signOut] = useSignOut(auth);
+	// TODO implement loading and error states for signout
 	const dispatch = useDispatch();
 	return (
 		<Button
@@ -21,8 +22,7 @@ export default function SignoutButton() {
 				}
 			}}
 		>
-			{' '}
-			Sign Out
+			{withText === true && <>Sign Out</>}
 		</Button>
 	);
 }

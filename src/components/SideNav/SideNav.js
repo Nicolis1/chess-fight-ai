@@ -2,6 +2,8 @@ import { React, useCallback, useEffect, useState } from 'react';
 import './SideNav.css';
 import Button from '../Button/Button';
 import SignoutButton from '../Button/SignoutButton';
+import NewBot from '../Button/NewBot';
+
 import { useSelector } from 'react-redux';
 import BotSelections from './BotSelections';
 
@@ -9,7 +11,7 @@ export default function SideNav(props) {
 	const [collapsed, setCollapsed] = useState(true);
 	const toggleCollapse = useCallback(() => {
 		setCollapsed(!collapsed);
-	});
+	}, [collapsed]);
 	const activeCodeID = useSelector((state) => state.activeCode.value);
 
 	useEffect(() => {
@@ -21,17 +23,21 @@ export default function SideNav(props) {
 			<div className='container'>
 				{!collapsed && (
 					<div className='sideNavContent'>
-						<div className='actionButtons'>
-							<SignoutButton />
+						<div>
+							<BotSelections />
 						</div>
-						<BotSelections />
+						<div className='actionButtons'>
+							<NewBot />
+							<SignoutButton withText={true} />
+						</div>
 					</div>
 				)}
-
-				<Button
-					icon={collapsed ? 'icon-arrow-right' : 'icon-arrow-left'}
-					onClick={toggleCollapse}
-				></Button>
+				<div className='toggleButton'>
+					<Button
+						icon={collapsed ? 'icon-arrow-right' : 'icon-arrow-left'}
+						onClick={toggleCollapse}
+					></Button>
+				</div>
 			</div>
 		</div>
 	);

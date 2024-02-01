@@ -1,9 +1,9 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApp, getApps } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// TODO env local isn't working for some reason, these will need to change before publishing @nocommit
+// TODO env local isn't working for some reason
 const firebaseConfig = {
 	apiKey: 'AIzaSyCYtz0ifl3Eh-B_zSoOz1jXmLLmEYVbc1o',
 	authDomain: 'chessfight-5257b.firebaseapp.com',

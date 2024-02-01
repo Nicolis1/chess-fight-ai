@@ -1,13 +1,13 @@
 .sideNav{
     height: 100%;
-    background-color: #6eabbf;
+    background-color: #EFEEEA;
     display: flex;
     flex-direction: column;
     transition: 0.5s; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) inset;
 }
 .sideNav.collapsed{
-    width: 30px;
+    width: 20px;
 }
 .expanded{
     width:300px;
@@ -15,7 +15,32 @@
 .sideNavContent{
     width:100%;
     border-right: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 12px;
+    overflow-y: scroll;
+}
+.sideNavContent h1{
+    margin: 0;
+}
+.sideNavContent .custom-button{
+    margin-top: 4px;
+    border-radius: 5px;
+    border: 1px solid #2f2f2f;
+    box-sizing: border-box;
+    padding: 4px;
+}
+.toggleButton{
+    height:100%;
+    width: 20px;
+    display: flex;
+    font-size: .8em;
+    background-color: #B58863;
 }
 
-
-
+.sideNavContent .actionButtons{
+    margin-top: 16px;
+    border-top: 2px solid #2f2f2f;
+}

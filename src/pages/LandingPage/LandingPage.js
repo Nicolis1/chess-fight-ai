@@ -22,7 +22,7 @@ function CreateAccountModalContent({ toggleDisplayLogin }) {
 	});
 	const [error, setError] = useState('');
 
-	const [createUserWithEmailAndPassword, user, loading, authError] =
+	const [createUserWithEmailAndPassword, authError] =
 		useCreateUserWithEmailAndPassword(auth);
 
 	const handleChange = (e) => {
@@ -109,13 +109,13 @@ function CreateAccountModalContent({ toggleDisplayLogin }) {
 			</div>
 
 			<p>
-				<a
+				<button
 					onClick={() => {
 						toggleDisplayLogin();
 					}}
 				>
 					Already have an account? Click here to login.
-				</a>
+				</button>
 			</p>
 		</div>
 	);
@@ -128,7 +128,7 @@ function LoginModalContent({ toggleDisplayLogin }) {
 	const [error, setError] = useState('');
 	const dispatch = useDispatch();
 
-	const [signInWithEmailAndPassword, user, loading, authError] =
+	const [signInWithEmailAndPassword, authError] =
 		useSignInWithEmailAndPassword(auth);
 
 	const handleChange = (e) => {
@@ -187,13 +187,13 @@ function LoginModalContent({ toggleDisplayLogin }) {
 			</div>
 
 			<p>
-				<a
+				<button
 					onClick={() => {
 						toggleDisplayLogin();
 					}}
 				>
 					Don't have an account yet? Click here to make one.
-				</a>
+				</button>
 			</p>
 		</div>
 	);
@@ -207,7 +207,7 @@ function LandingPage() {
 		if (user) {
 			dispatch(setPage(PAGES.EditorPage));
 		}
-	}, [user]);
+	}, [dispatch, user]);
 
 	return (
 		<div className={'background'}>

@@ -3,14 +3,14 @@ import './Button.css';
 
 export default function Button(props) {
 	return (
-		<div className='icon' onClick={props.onClick}>
-			<a
+		<div className='custom-button' onClick={props.onClick}>
+			<div className='children'>{props.children}</div>
+			<span
 				data-tooltip-content={props.tooltipContent}
 				data-tooltip-id={props.tooltipID}
 			>
 				<i className={props.icon} />
-				{props.children}
-			</a>
+			</span>
 		</div>
 	);
 }

@@ -1,11 +1,10 @@
 .container{
     display: flex;
-    width: 100%;
-    height: 100%;
+    flex:1;
+    overflow: hidden;
 }
 .editorSection{
     flex-grow: 100;
-    background-color:#B58864 ; 
     height: 100%;
     overflow-y: hidden;
     border-right:1px solid black;
@@ -13,16 +12,35 @@
 
 .titleBar{
     height:30px;
-    padding: 10px;
+    padding: 4px;
     font-weight: bold;
     border-bottom: 1px solid black;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    background-color: #FCEFE6;
+}
+.titleBar span{
+    font-size: 24px;
+    font-weight: bold;
+    padding-right: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
+    width: 100%;
+    
+}
+.titleBar .displayTitle{
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    
 }
 .editorButtons{
+    width: 110px;
     display: flex;
     flex-direction: row;
+    cursor: crosshair;
 }
 .editorButtons *{
     padding: 5px;
@@ -35,7 +53,7 @@
     height:100%;
     display: flex;
     flex-direction: column;
-    background-color: #F0DEC7;
+    background-color: #EFEEEA;
 }
 .gameVisualization{
     width:300px;
