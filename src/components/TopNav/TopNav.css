@@ -1,0 +1,30 @@
+.topNav{
+    background-color: #2f2f2f;
+    height: 45px;
+    min-height: 45px;
+    width: 100%;
+    line-height: 45px;
+    color:#EFEEEA;
+    box-sizing: border-box;
+    padding-left: 8px;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+   
+}
+.topNav>.main-content{
+    display: flex;
+    flex-direction: row;
+    font-size: 16px;
+}
+.topNav>.main-content>*{
+    margin-right:16px;
+}
+.topNav .home{
+    font-size: 20px;
+
+}
+.topNav .custom-button{
+   width: fit-content;
+}
