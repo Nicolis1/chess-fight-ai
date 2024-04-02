@@ -1,5 +1,5 @@
 import { Chess } from 'chess.js';
-export const STARTER_CODE2 =
+export const STARTER_CODE1 =
 	//comment for code formatting
 	`function getMove(position){
 	/* edit your code here, 
@@ -9,7 +9,7 @@ export const STARTER_CODE2 =
 }
 return getMove(position);`;
 
-export const STARTER_CODE =
+export const STARTER_CODE2 =
 	//comment for code formatting
 	`function getMove(position){
 	/* edit your code here, 

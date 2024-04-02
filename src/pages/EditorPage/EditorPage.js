@@ -92,15 +92,20 @@ function EditorPage() {
 		}
 		let game = new Chess();
 		console.log(movesClone);
-		const id = setInterval(() => {
-			if (movesClone.length > 0) {
-				game.move(movesClone.shift());
-			} else {
-				clearInterval(id);
-			}
-			setDisplayFen(game.fen());
-		}, 100);
-		setIntervalID(id);
+		// quick delay before starting to readjust focus visually
+		setDisplayFen(game.fen());
+
+		setTimeout(() => {
+			const id = setInterval(() => {
+				if (movesClone.length > 0) {
+					game.move(movesClone.shift());
+				} else {
+					clearInterval(id);
+				}
+				setDisplayFen(game.fen());
+			}, 150);
+			setIntervalID(id);
+		}, 500);
 	};
 
 	return (
