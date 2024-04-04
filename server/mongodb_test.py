@@ -151,7 +151,6 @@ def new_user():
 @app.route('/bots/new', methods=['POST'])
 @login_required
 def new_bot():
-    print(request.__dict__)
     data = request.json
     user_id = current_user.get_id()
     user_data = userCollection.find_one({'userid':  user_id})
@@ -162,6 +161,18 @@ def new_bot():
         userCollection.update_one({'userid': user_id}, {'$push':{"bots":bot_id}})
    
     return parse_json({'message': 'bot added', 'bot_id': str(bot_id), 'code':data["code"], "name":name}), 201
+
+@app.route('/user/bots', methods=['GET'])
+@login_required
+def get_bots():
+    user_id = current_user.get_id()
+    user_data = userCollection.find_one({'userid':  user_id})
+    if user_data != None:
+        # Querying the collection
+        results = botCollection.find({"botid": {"$in": user_data["bots"]}})
+        return parse_json({"bots":results}), 200
+   
+    return parse_json({'error': "no active user"}), 401
 
 #Challenges
 # here wwe will build the backend for 1:1 challenges, and tournaments
