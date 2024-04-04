@@ -8,6 +8,7 @@ import Button from '../Button/Button.tsx';
 import { useSelector } from 'react-redux';
 import React from 'react';
 import { ActiveCodeState } from '../../data/stores/dataStore.ts';
+import { fetchBots } from '../../data/utils.ts';
 
 export default function BotSelections(props) {
 	const dispatch = useDispatch();
@@ -16,9 +17,16 @@ export default function BotSelections(props) {
 	);
 
 	const [myBots, setMyBots] = useState<Array<BotData>>([]);
-
-	//todo reimplement getting users' bots
-	useEffect(() => {});
+	useEffect(() => {
+		async function getBots() {
+			const botsForState = await fetchBots();
+			setMyBots(botsForState);
+		}
+		getBots();
+	}, [setMyBots]);
+	if (myBots.length === 0) {
+		return <p>Loading...</p>;
+	}
 	return (
 		<>
 			<h1>Bots</h1>
@@ -27,7 +35,14 @@ export default function BotSelections(props) {
 					<Button
 						key={bot.id}
 						onClick={() => {
-							// dispatch(setActiveCodeData(bot.botID));
+							if (bot.id !== activeCode?.id)
+								dispatch(
+									setActiveCodeData({
+										id: bot.id,
+										code: bot.code,
+										name: bot.name,
+									}),
+								);
 						}}
 						icon='icon-pencil'
 					>

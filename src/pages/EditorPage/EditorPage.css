@@ -35,13 +35,13 @@
     display: flex;
     justify-content: space-between;
     width: 80%;
+    cursor: text;
     
 }
 .editorButtons{
     width: 110px;
     display: flex;
     flex-direction: row;
-    cursor: crosshair;
 }
 .editorButtons *{
     padding: 5px;

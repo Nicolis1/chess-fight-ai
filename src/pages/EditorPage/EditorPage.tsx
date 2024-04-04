@@ -7,12 +7,15 @@ import { javascript } from '@codemirror/lang-javascript';
 import Button from '../../components/Button/Button.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
-import { simulateGames } from '../../data/utils';
+import { fetchBots, newBot, simulateGames } from '../../data/utils.ts';
 import TestResults from '../../components/TestResults/TestResultsTable.tsx';
 import { Tooltip } from 'react-tooltip';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
-import type { BotData } from '../../data/features/activeCodeSlice.ts';
+import {
+	setActiveCodeData,
+	type BotData,
+} from '../../data/features/activeCodeSlice.ts';
 import type { ActiveCodeState } from '../../data/stores/dataStore.ts';
 function EditorPage() {
 	const activeCodeData = useSelector(
@@ -26,6 +29,7 @@ function EditorPage() {
 	const [botData, setBotData] = useState<BotData | null>(null);
 	const [editingTitle, setEditingTitle] = useState(false);
 	const [hoveringTitle, setHoveringTitle] = useState(false);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		(async () => {
@@ -36,9 +40,17 @@ function EditorPage() {
 					console.error(error);
 					alert(error.message);
 				}
+			} else {
+				const bots = await fetchBots();
+				if (bots.length > 0) {
+					dispatch(setActiveCodeData(bots[0]));
+				} else {
+					const bot = await newBot();
+					if (bot) dispatch(setActiveCodeData(bot));
+				}
 			}
 		})();
-	}, [activeCodeData]);
+	}, [activeCodeData, dispatch]);
 
 	const onChange = (code: string) => {
 		setBotData({ ...botData, code });
@@ -67,6 +79,18 @@ function EditorPage() {
 			botData.name != null
 		) {
 			// todo, save updates to code
+			const resp = await fetch('/bots/update', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					botid: botData.id,
+					name: botData.name,
+					code: botData.code,
+				}),
+			});
+			console.log(resp);
 		} else {
 			alert('Nothing to save');
 		}

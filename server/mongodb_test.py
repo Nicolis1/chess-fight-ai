@@ -135,16 +135,20 @@ def get_item(user_id):
 def new_user():
     data = request.json
     if data["username"] != None and data["email"] != None and data["password"] != None:
+        user_id = uuid4().hex
+        bot_id = uuid4().hex
         item_id = userCollection.insert_one({
             "username":data["username"],
             "email":data["email"],
             "password":hashpw(data["password"].encode('utf-8'), gensalt()), 
-            "bots":[],
-            "userid":uuid4().hex
+            "bots":[bot_id],
+            "userid":user_id
             }).inserted_id
-    return parse_json({'message': 'user added', 'item_id': str(item_id),}), 201
-
-
+        
+     
+        #start new users with one bot
+        botCollection.insert_one({"code":"return moves.random()", "owner":user_id, "name":"New Bot",  "botid":bot_id})
+    return parse_json({'message': 'user added', 'item_id': str(item_id),}), 200
 
 
 #Bots (maybe should be separate file?)
@@ -155,25 +159,44 @@ def new_bot():
     user_id = current_user.get_id()
     user_data = userCollection.find_one({'userid':  user_id})
     bot_id = uuid4().hex
-    name = "New Bot"
+    print(user_data["bots"])
+    name = "New Bot" + str(len(user_data["bots"]))
     if user_data != None:
-        botCollection.insert_one({"username":data["code"], "owner":user_id, "name":name,  "botid":bot_id})
+        botCollection.insert_one({"code":data["code"], "owner":user_id, "name":name,  "botid":bot_id})
         userCollection.update_one({'userid': user_id}, {'$push':{"bots":bot_id}})
-   
-    return parse_json({'message': 'bot added', 'bot_id': str(bot_id), 'code':data["code"], "name":name}), 201
+        
+    return parse_json({'message': 'bot added', 'bot_id': str(bot_id), 'code':data["code"], "name":name}), 200
 
-@app.route('/user/bots', methods=['GET'])
+@app.route('/bots/all', methods=['GET'])
 @login_required
 def get_bots():
     user_id = current_user.get_id()
     user_data = userCollection.find_one({'userid':  user_id})
     if user_data != None:
-        # Querying the collection
         results = botCollection.find({"botid": {"$in": user_data["bots"]}})
-        return parse_json({"bots":results}), 200
-   
+        response = parse_json({"bots":results})
+        response.headers['Cache-Control'] = 'max-age=3600'  
+        return response, 200
     return parse_json({'error': "no active user"}), 401
 
+@app.route('/bots/update', methods=['POST'])
+@login_required
+def update_bot():
+    bot_data = request.json
+    modified = 0
+    try:
+        print("here")
+        if bot_data["name"]!=None and bot_data["code"]!=None:
+            print('code and name')
+            modified = botCollection.update_one({"botid":bot_data["botid"]},{"$set":{"code":bot_data["code"], "name":bot_data["name"]}}).modified_count
+            print(modified)
+            print(bot_data["name"])
+        if(modified == 0):
+            return parse_json({'message': "nothing modified"}), 204
+        else:
+            return parse_json({"message": str(modified) +' bots updated'}), 200
+    except:
+        return parse_json({'error': "missing data"}), 400
 #Challenges
 # here wwe will build the backend for 1:1 challenges, and tournaments
 
