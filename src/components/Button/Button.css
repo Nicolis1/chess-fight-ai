@@ -4,6 +4,7 @@
     align-items: center;
     padding-right: 4px;
     justify-content: space-between;
+    color: inherit;
 }
 .custom-button:hover{
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5) inset;

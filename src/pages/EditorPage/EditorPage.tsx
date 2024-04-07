@@ -7,7 +7,12 @@ import { javascript } from '@codemirror/lang-javascript';
 import Button from '../../components/Button/Button.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
-import { fetchBots, newBot, simulateGames } from '../../data/utils.ts';
+import {
+	fetchActiveUser,
+	fetchBots,
+	newBot,
+	simulateGames,
+} from '../../data/utils.ts';
 import TestResults from '../../components/TestResults/TestResultsTable.tsx';
 import { Tooltip } from 'react-tooltip';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,10 +21,14 @@ import {
 	setActiveCodeData,
 	type BotData,
 } from '../../data/features/activeCodeSlice.ts';
-import type { ActiveCodeState } from '../../data/stores/dataStore.ts';
+import type { ActiveState } from '../../data/stores/dataStore.ts';
+import { setActiveUser } from '../../data/features/activeUserSlice.ts';
 function EditorPage() {
 	const activeCodeData = useSelector(
-		(state: ActiveCodeState) => state.activeCode.value,
+		(state: ActiveState) => state.activeCode.value,
+	);
+	const activeUser = useSelector(
+		(state: ActiveState) => state.activeUser.value,
 	);
 	const [results, setResults] = useState(null);
 	const [calculating, setCalculating] = useState(false);
@@ -27,30 +36,44 @@ function EditorPage() {
 	const [intervalID, setIntervalID] = useState<NodeJS.Timeout | null>(null);
 
 	const [botData, setBotData] = useState<BotData | null>(null);
+	const [selectedTestOpponentData, setSelectedTestOpponentData] =
+		useState<BotData | null>(null);
 	const [editingTitle, setEditingTitle] = useState(false);
 	const [hoveringTitle, setHoveringTitle] = useState(false);
+	const [allBots, setAllBots] = useState<BotData[]>([]);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
 		(async () => {
+			if (activeUser == null) {
+				fetchActiveUser().then((activeUserData) => {
+					if (!activeUserData) {
+						document.location = '/login';
+					} else {
+						dispatch(
+							setActiveUser({
+								id: activeUserData.id,
+								username: activeUserData.username,
+							}),
+						);
+					}
+				});
+			}
+			const bots = await fetchBots();
 			if (activeCodeData) {
-				try {
-					setBotData(activeCodeData);
-				} catch (error) {
-					console.error(error);
-					alert(error.message);
-				}
+				setBotData(activeCodeData);
+			} else if (bots.length > 0) {
+				dispatch(setActiveCodeData(bots[0]));
 			} else {
-				const bots = await fetchBots();
-				if (bots.length > 0) {
-					dispatch(setActiveCodeData(bots[0]));
-				} else {
-					const bot = await newBot();
-					if (bot) dispatch(setActiveCodeData(bot));
-				}
+				const bot = await newBot();
+				if (bot) dispatch(setActiveCodeData(bot));
+			}
+			if (bots.length > 0) {
+				setAllBots(bots);
+				setSelectedTestOpponentData(bots[0]);
 			}
 		})();
-	}, [activeCodeData, dispatch]);
+	}, [activeCodeData, activeUser, dispatch]);
 
 	const onChange = (code: string) => {
 		setBotData({ ...botData, code });
@@ -63,10 +86,8 @@ function EditorPage() {
 	const runCode = () => {
 		if (botData && botData.code != null) {
 			setCalculating(true);
-			// new Function call's eval on user submitted code, this is potentially dangerous
-			// eslint-disable-next-line no-new-func
-			const decisionFunction = new Function('position', botData.code);
-			simulateGames(decisionFunction, finishSimulation);
+
+			simulateGames(activeCodeData, selectedTestOpponentData, finishSimulation);
 		} else {
 			alert('Nothing to run');
 		}
@@ -188,6 +209,28 @@ function EditorPage() {
 					{<Board position={displayFen}></Board>}
 				</div>
 				<div className='testOutput'>
+					<div className='title'>
+						<h1>Test Vs.</h1>
+						<select
+							name='opponentBot'
+							value={selectedTestOpponentData?.id}
+							onChange={(e) => {
+								const selectedBotData = allBots.find(
+									(botData) => botData.id === e.target.value,
+								);
+
+								setSelectedTestOpponentData(selectedBotData || allBots[0]);
+							}}
+						>
+							{allBots.map((botData) => {
+								return (
+									<option key={botData.id} value={botData.id}>
+										{botData.name}
+									</option>
+								);
+							})}
+						</select>
+					</div>
 					{calculating && 'calculating'}
 					{results != null && (
 						<TestResults response={results} playMoves={playMoves} />

@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { Chess } from 'chess.js';
 import Board from '../../components/board/Board.tsx';
 import './LandingPage.css';
-import { useDispatch } from 'react-redux';
 import React from 'react';
+import SignInWithGoogle from '../../components/SignInWith/SignInWithGoogle.tsx';
+import SignInWithGithub from '../../components/SignInWith/SignInWithGithub.tsx';
+import SignInWithFacebook from '../../components/SignInWith/SignInWithFacebook.tsx';
 
-function CreateAccountModalContent({ toggleDisplayLogin }) {
-	const dispatch = useDispatch();
-
+function CreateAccountModalContent() {
 	const [formData, setFormData] = useState({
-		email: '',
 		username: '',
 		password: '',
 		confirmpassword: '',
@@ -24,10 +23,8 @@ function CreateAccountModalContent({ toggleDisplayLogin }) {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		// Basic validation (you may want to add more complex validation)
 		if (
 			formData.username.length < 3 ||
-			formData.email.length < 3 ||
 			formData.password.length < 3 ||
 			formData.confirmpassword.length < 3 ||
 			formData.password !== formData.confirmpassword
@@ -46,68 +43,49 @@ function CreateAccountModalContent({ toggleDisplayLogin }) {
 	return (
 		<div>
 			<h2>Create Account</h2>
-			{error && <p className='error-message'>{error}</p>}
 			<div>
 				<form onSubmit={handleSubmit} className='login-container'>
-					<label>
-						Email:
-						<input
-							type='text'
-							name='email'
-							value={formData.email}
-							onChange={handleChange}
-						/>
-					</label>
-					<label>
-						Username:
-						<input
-							type='text'
-							name='username'
-							value={formData.username}
-							onChange={handleChange}
-						/>
-					</label>
-					<label>
-						Password:
-						<input
-							type='password'
-							name='password'
-							value={formData.password}
-							onChange={handleChange}
-						/>
-					</label>
-					<label>
-						Confirm Password:
-						<input
-							type='password'
-							name='confirmpassword'
-							value={formData.confirmpassword}
-							onChange={handleChange}
-						/>
-					</label>
+					<input
+						type='text'
+						name='username'
+						placeholder='username'
+						value={formData.username}
+						onChange={handleChange}
+					/>
+					<input
+						type='password'
+						name='password'
+						placeholder='password'
+						value={formData.password}
+						onChange={handleChange}
+					/>
+					<input
+						type='password'
+						name='confirmpassword'
+						placeholder='confirm  password'
+						value={formData.confirmpassword}
+						onChange={handleChange}
+					/>
+					{error && <p className='error-message'>{error}</p>}
 					<button type='submit'>Create Account</button>
 				</form>
 			</div>
+			<hr />
 
-			<p>
-				<button
-					onClick={() => {
-						toggleDisplayLogin();
-					}}
-				>
-					Already have an account? Click here to login.
-				</button>
-			</p>
+			<div style={{ padding: '5px 10px 10px 10px' }}>
+				Already have an account? <a href='/login'>click here to login</a>
+			</div>
 		</div>
 	);
 }
-function LoginModalContent({ toggleDisplayLogin }) {
+function LoginModalContent(props: { tryagain?: boolean }) {
 	const [formData, setFormData] = useState({
 		username: 'ted',
 		password: '123',
 	});
-	const [error, setError] = useState('');
-	const dispatch = useDispatch();
+	const [error, setError] = useState(
+		props.tryagain ? 'incorrect username or password' : '',
+	);
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -120,78 +98,60 @@ function LoginModalContent({ toggleDisplayLogin }) {
 			e.preventDefault();
 			return false;
 		}
-		// dispatch(setPage(PAGES.EditorPage));
 		return true;
 	};
 
 	return (
 		<div>
-			<h2>Login</h2>
-			{error && <p className='error-message'>{error}</p>}
-			<div>
-				<form
-					action={`/login`}
-					onSubmit={validate}
-					method='POST'
-					className='login-container'
-				>
-					<label>
-						Username:
-						<input
-							type='text'
-							name='username'
-							value={formData.username}
-							onChange={handleChange}
-						/>
-					</label>
-					<label>
-						Password:
-						<input
-							type='password'
-							name='password'
-							value={formData.password}
-							onChange={handleChange}
-						/>
-					</label>
-					<button type='submit'>Login</button>
-				</form>
-			</div>
+			<div className='title'>Login</div>
+			<form
+				action={`/login`}
+				onSubmit={validate}
+				method='POST'
+				className='login-container'
+			>
+				<input
+					type='text'
+					name='username'
+					placeholder='username'
+					value={formData.username}
+					onChange={handleChange}
+				/>
+				<input
+					type='password'
+					name='password'
+					placeholder='password'
+					value={formData.password}
+					onChange={handleChange}
+				/>
+				{error && <p className='error-message'>{error}</p>}
+				<button type='submit'>Login</button>
+			</form>
 
-			<p>
-				<button
-					onClick={() => {
-						toggleDisplayLogin();
-					}}
-				>
-					Don't have an account yet? Click here to make one.
-				</button>
-			</p>
+			<div className='orlogin'>or login with one of these</div>
+			<div className='signInWithIcons'>
+				<SignInWithGoogle />
+				<SignInWithGithub />
+				<SignInWithFacebook />
+			</div>
+			<hr />
+
+			<div style={{ padding: '5px 10px 10px 10px' }}>
+				Don't have a chessfight account yet? <a href='/join'>sign up here</a>
+			</div>
 		</div>
 	);
 }
 
-function LandingPage() {
-	const [displayLogin, setDisplayLogin] = useState(true);
-	const dispatch = useDispatch();
-
+function LandingPage(props: { signup?: boolean; tryagain?: boolean }) {
 	return (
 		<div className={'background'}>
 			{/* popover with login info */}
 			<div className='welcomePopover'>
-				<div className='title'>Welcome to ChessFight</div>
-
-				{displayLogin ? (
-					<LoginModalContent
-						toggleDisplayLogin={() => {
-							setDisplayLogin(!displayLogin);
-						}}
-					/>
+				{props.signup ? (
+					<CreateAccountModalContent />
 				) : (
-					<CreateAccountModalContent
-						toggleDisplayLogin={() => {
-							setDisplayLogin(!displayLogin);
-						}}
-					/>
+					<LoginModalContent tryagain={props.tryagain} />
 				)}
 			</div>
 			{/* this will be a chessboard playing an automated game blurred */}

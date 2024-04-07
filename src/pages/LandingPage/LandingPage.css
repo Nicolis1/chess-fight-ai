@@ -21,30 +21,48 @@ body{
     top:15%;
     transform: translate(-50%, 0);
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
-
 }
-
 .welcomePopover .title{
-    font-size: 32px;
-    font-weight: bold;
-    text-wrap: nowrap;
-    padding: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-size: 2em;
+    text-align: center;
 }
-.welcomePopover p{
-    padding-left: 5px;
-    width: 400px;
+.login-container{
+    display: flex;
+    flex-direction: column;
 }
-.welcomePopover button{
-    width: 300px;
-    height:40px;
-    font-size: 20px;
-    background-color: #EFEEEA ;
+.login-container>*{
+    margin: 10px;
+    font-size: 1.2em;
+}
+.login-container>button{
+    width:50%;
     margin: auto;
+    border-radius: 15px;
 }
-.welcomePopover button:hover{
-    background-color: #6eabbf;
+.login-container>button:hover{
+    width:60%;
+    border-radius: 15px;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
 }
+.welcomePopover .error-message{
+    text-align: center;
+    color:maroon;
+}
+.orlogin{
+    width: 100%;
+    text-align: center;
+    color: gray;
+}
+.signInWithIcons{
+    width: 50%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+}
+
 .gameBoard{
     filter:brightness(70%) blur(4px);
     padding: 10px;
@@ -54,8 +72,4 @@ body{
     width:700px;
     height: fit-content;
     border-bottom: 1px solid black;
-}
-.login-container{
-    display: flex;
-    flex-direction: column;
 }

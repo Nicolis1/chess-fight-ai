@@ -47,7 +47,6 @@ class User(UserMixin):
         self.id = id
         self._is_authenticated = True
    
-      
     @classmethod
     def from_user_data(self, user_data):
         return User(user_data["username"],user_data["password"],user_data["userid"])
@@ -93,7 +92,7 @@ def login():
             print(session)
             return redirect('/editor')
     
-    return parse_json({'error': 'invalid username or password'}), 401
+    return redirect('/login/tryagain')
 
 @app.route('/logout', methods=['POST'])
 @login_required
@@ -120,6 +119,13 @@ def user_info():
 def get_all_users():
     users = list(userCollection.find())
     return parse_json(users), 200
+
+@app.route('/users/active', methods=['GET'])
+def get_active_user():
+    if current_user.is_authenticated:
+        return parse_json({"username":current_user.username,"userid":current_user.id}), 200
+    else:
+        return parse_json({"userid": None}), 200
 
 @app.route('/users/<user_id>', methods=['GET'])
 def get_item(user_id):

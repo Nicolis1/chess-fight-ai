@@ -4,6 +4,7 @@ import EditorPage from './pages/EditorPage/EditorPage.tsx';
 import TopNav from './components/TopNav/TopNav.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import React from 'react';
+import CompetePage from './pages/CompetePage/CompetePage.tsx';
 
 function App() {
 	const router = createBrowserRouter([
@@ -12,8 +13,25 @@ function App() {
 			element: <LandingPage />,
 		},
 		{
-			path: '/index',
+			path: '/join',
+			element: <LandingPage signup={true} />,
+		},
+		{
+			path: '/login',
 			element: <LandingPage />,
+		},
+		{
+			path: '/login/tryagain',
+			element: <LandingPage tryagain={true} />,
+		},
+		{
+			path: '/compete',
+			element: (
+				<div className='appContainer'>
+					<TopNav />
+					<CompetePage />
+				</div>
+			),
 		},
 		{
 			path: '/editor',

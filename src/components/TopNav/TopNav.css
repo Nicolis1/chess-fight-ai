@@ -1,17 +1,21 @@
+.topNav a{
+    color:#EFEEEA;
+    text-decoration: none;
+}
+.topNav a:hover{
+    text-decoration: underline;
+}
 .topNav{
     background-color: #2f2f2f;
     height: 45px;
-    min-height: 45px;
     width: 100%;
-    line-height: 45px;
-    color:#EFEEEA;
     box-sizing: border-box;
     padding-left: 8px;
     padding-right: 8px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-   
+   align-items: center;
 }
 .topNav>.main-content{
     display: flex;
@@ -23,8 +27,13 @@
 }
 .topNav .home{
     font-size: 20px;
-
 }
-.topNav .custom-button{
-   width: fit-content;
+.userIndicator{
+    color:white;
+    padding-right: 10px;
+    float: left
+}
+.rightContent{
+    color: white;
+    width: fit-content;
 }

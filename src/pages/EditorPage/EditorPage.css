@@ -65,3 +65,14 @@
    flex-grow: 100;
    overflow: scroll;
 }
+.testOutput .title {
+    display: flex;
+    align-items: center;
+}
+.testOutput .title select{
+    font-size: 2em;
+    background-color: inherit;
+    border: none;
+    border-bottom: 1px solid black;
+    height:50px;
+}

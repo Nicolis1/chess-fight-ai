@@ -39,27 +39,51 @@ export function testBot(position) {
 }
 
 type Game = {
-	playerColor:string,
-	board:Chess
-}
+	playerColor: string;
+	board: Chess;
+};
 type SimulatedGame = {
-	winner:boolean|null,
-	draw: boolean,
-	turns: number,
-	reachedMoveLimit:boolean,
-	moves:Array<string>,
-	playerColor:string
-}
-export async function simulateGames(decisionFunction, callback) {
+	winner: boolean | null;
+	draw: boolean;
+	turns: number;
+	reachedMoveLimit: boolean;
+	moves: Array<string>;
+	playerColor: string;
+};
+export async function simulateGames(
+	botData: BotData | null,
+	opponentData: BotData | null,
+	callback: {
+		(results: any): void;
+		(arg0: {
+			success: boolean;
+			opponent?: string;
+			results?: SimulatedGame[];
+			error?: any;
+		}): void;
+	},
+) {
 	const maxMoves = 50;
 	try {
-		const games:Array<Game> = [];
+		const games: Array<Game> = [];
 		for (let i = 0; i < 10; i++) {
 			games.push({
 				playerColor: Math.random() < 0.5 ? 'w' : 'b',
 				board: new Chess(),
 			});
 		}
+		if (botData?.code == null) {
+			callback({ success: false, error: 'no selected bot code' });
+			return;
+		}
+		// new Function call's eval on user submitted code, this is potentially dangerous
+		// eslint-disable-next-line no-new-func
+		const decisionFunction = new Function('position', botData.code);
+		const opponentDecisionFunction = opponentData?.code
+			? // eslint-disable-next-line no-new-func
+			  new Function('position', opponentData.code)
+			: null;
+
 		for (let i = 0; i < maxMoves * 2; i++) {
 			for (let game of games) {
 				// console.log(game.moveNumber());
@@ -67,19 +91,21 @@ export async function simulateGames(decisionFunction, callback) {
 					if (game.board.turn() === game.playerColor) {
 						game.board.move(decisionFunction(game.board));
 					} else {
-						game.board.move(testBot(game.board));
+						if (opponentDecisionFunction) {
+							game.board.move(opponentDecisionFunction(game.board));
+						} else {
+							game.board.move(testBot(game.board));
+						}
 					}
 				}
 			}
 		}
-		const results:Array<SimulatedGame> = [];
+		const results: Array<SimulatedGame> = [];
 		for (let game of games) {
-			let winner:boolean|null = null;
+			let winner: boolean | null = null;
 			if (game.board.isCheckmate()) {
 				// the winner is whoever's turn it isn't on the last turn
 				winner = game.board.turn() !== game.playerColor;
-				console.log(game.playerColor);
-				console.log(winner);
 			}
 			results.push({
 				winner,
@@ -90,7 +116,11 @@ export async function simulateGames(decisionFunction, callback) {
 				playerColor: game.playerColor,
 			});
 		}
-		callback({ success: true, opponent: 'TestBot', results });
+		callback({
+			success: true,
+			opponent: opponentData ? opponentData.name : 'TestBot',
+			results,
+		});
 	} catch (error) {
 		console.error(error);
 		callback({ success: false, error });
@@ -115,30 +145,47 @@ export async function fetchBots() {
 	return botsForState;
 }
 
-export async function newBot():Promise<BotData | null>{
+export async function newBot(): Promise<BotData | null> {
 	try {
-					
 		const resp = await fetch(`/bots/new`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({ code: STARTER_CODE2 }),
-		})
-		
+		});
+
 		console.log(resp);
 		const response = JSON.parse(await resp.json());
-			// fetch the bots again so cache is ready for when you next open the drawer
+		// fetch the bots again so cache is ready for when you next open the drawer
 		fetch('/bots/all', {
-				method: 'GET',
-				cache: 'reload',
+			method: 'GET',
+			cache: 'reload',
 		});
 		return {
 			id: response.bot_id,
 			name: response.name,
 			code: response.code,
-		}
+		};
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
 
+export async function fetchActiveUser() {
+	try {
+		const resp = await fetch(`/users/active`, {
+			method: 'GET',
+		});
+		const response = JSON.parse(await resp.json());
+		if (response.userid == null) {
+			return null;
+		}
+		return {
+			id: response.userid,
+			username: response.username,
+		};
 	} catch (error) {
 		console.error(error);
 		return null;
