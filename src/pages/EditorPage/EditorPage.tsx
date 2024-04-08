@@ -210,9 +210,10 @@ function EditorPage() {
 				</div>
 				<div className='testOutput'>
 					<div className='title'>
-						<h1>Test Vs.</h1>
+						<h1 id='opponentBotTitle'>Test Vs.</h1>
 						<select
 							name='opponentBot'
+							aria-labelledby='opponentBotTitle'
 							value={selectedTestOpponentData?.id}
 							onChange={(e) => {
 								const selectedBotData = allBots.find(

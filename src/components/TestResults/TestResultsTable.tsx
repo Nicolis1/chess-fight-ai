@@ -28,7 +28,6 @@ function TestResult(props) {
 					className='detailsLink'
 					onClick={() => {
 						setShowDetails(!showDetails);
-						console.log(props.data.winner);
 					}}
 				>
 					details
@@ -59,12 +58,7 @@ export default function TestResults(props) {
 				/>
 			);
 		});
-		return (
-			<div>
-				<div className='resultsTitle'>Results vs {props.response.opponent}</div>
-				{resultComponents}
-			</div>
-		);
+		return <div>{resultComponents}</div>;
 	} else {
 		// there was an error
 		return (

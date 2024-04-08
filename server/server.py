@@ -8,7 +8,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from uuid import uuid4
-import json
+import time
+
 
 dotenv_path = Path('../.env.local')
 
@@ -70,10 +71,8 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     user_data = userCollection.find_one({'userid': user_id})
-    print("\n\n",user_data,"\n\n")
     if user_data:
         user = User.from_user_data(user_data)
-        print("\n\n",user.toString(),"\n\n")
         return user
     else:
         return None
@@ -165,10 +164,9 @@ def new_bot():
     user_id = current_user.get_id()
     user_data = userCollection.find_one({'userid':  user_id})
     bot_id = uuid4().hex
-    print(user_data["bots"])
     name = "New Bot" + str(len(user_data["bots"]))
     if user_data != None:
-        botCollection.insert_one({"code":data["code"], "owner":user_id, "name":name,  "botid":bot_id})
+        botCollection.insert_one({"code":data["code"], "owner":user_id, "name":name,  "botid":bot_id, "challengable":False})
         userCollection.update_one({'userid': user_id}, {'$push':{"bots":bot_id}})
         
     return parse_json({'message': 'bot added', 'bot_id': str(bot_id), 'code':data["code"], "name":name}), 200
@@ -191,10 +189,9 @@ def update_bot():
     bot_data = request.json
     modified = 0
     try:
-        print("here")
-        if bot_data["name"]!=None and bot_data["code"]!=None:
+        if bot_data["name"]!=None and bot_data["code"]!=None and bot_data["challengable"]:
             print('code and name')
-            modified = botCollection.update_one({"botid":bot_data["botid"]},{"$set":{"code":bot_data["code"], "name":bot_data["name"]}}).modified_count
+            modified = botCollection.update_one({"botid":bot_data["botid"]},{"$set":{"code":bot_data["code"], "name":bot_data["name"], "challengable":bot_data["challengable"]}}).modified_count
             print(modified)
             print(bot_data["name"])
         if(modified == 0):
@@ -205,6 +202,59 @@ def update_bot():
         return parse_json({'error': "missing data"}), 400
 #Challenges
 # here wwe will build the backend for 1:1 challenges, and tournaments
+@app.route('/challenges/tournaments/new', methods=['POST'])
+@login_required
+def new_tourney():
+    data = request.json
+    user_id = current_user.get_id()     
+    if(user_id != "249f9e289959496688520646f009e11c"):
+        return parse_json({'error':'must login as admin'}), 401
+    
+    challenge_id = uuid4().hex
+    challengesCollection.insert_one({"type":"tournament", "match_data":[], "participants":[], "scheduled":data['time'],  "challengeid":challenge_id})
+    return parse_json({'message': 'tournament scheduled', 'challengeid': str(challenge_id), 'scheduled':data['time']}), 200
+
+@app.route('/challenges/direct/new', methods=['POST'])
+@login_required
+def new_challenge():
+    data = request.json
+    competitors = botCollection.find({"botid": {"$in": data["bots"]}})
+    listcom = list(competitors)
+    #todo add logic to check bots are owned by different people, and both are open to challenges
+    print(listcom)
+    scheduledTime =time.time()
+    challenge_id = uuid4().hex
+    challengesCollection.insert_one({"type":"challenge", "creator":current_user.get_id(), "match_data":[], "participants":listcom, "scheduled":scheduledTime,  "challengeid":challenge_id})
+    return parse_json({'message': 'tournament scheduled', 'challengeid': str(challenge_id), 'scheduled':scheduledTime}), 200
+
+@app.route('/challenges/created', methods=['GET'])
+@login_required
+def get_created_challenges():
+    created_challenges = challengesCollection.find({"creator":current_user.get_id()})
+    #todo add logic return a specific amount
+    return parse_json({'challenges':created_challenges}), 200
+
+@app.route('/challenges/tournaments', methods=['GET'])
+def get_existing_tournaments():
+    existing_tournaments = challengesCollection.find({"type":"tournament"})
+    #todo add logic to return only upcoming and recently finished challenges
+    return parse_json({'challenges':existing_tournaments}), 200
+
+@app.route('/challenges/tournaments', methods=['GET'])
+@login_required
+def join_tournament():
+    data = request.json
+    tournament_to_join = data['tournament']
+    bot_id= data['botid']
+    bot = botCollection.find({"botid": bot_id})
+    if(bot["owner"] != current_user.get_id):
+        return parse_json({'error':'only the owner of a bot can add it to a tournament'}), 401
+
+    # todo, confirm the tournament is in the future and this bot is eligible to join
+    # todo, prevent the bot from being edited after it has joined the tournament (editible flag, make a copy?)
+    challengesCollection.update_one({'challengeid': tournament_to_join}, {'$push':{"participants":bot_id}})
+    return parse_json({'message':"successfully joined tournament"}), 200
+
 
 def parse_json(data):
     return jsonify(json_util.dumps(data))
