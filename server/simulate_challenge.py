@@ -41,7 +41,7 @@ def run_docker_container():
     client = docker.from_env()
     imageName = client.images.build(path = "./", tag='fightbots')
     
-    container = client.containers.run("fightbots",
+    container = client.containers.run("fightbots","node fightbots.js --test -test",
                                       cpu_count=1,cpu_rt_period=60000,mem_limit="128m",network_disabled=True,read_only=True, detach=True)
     while True:
         print(container.logs())
