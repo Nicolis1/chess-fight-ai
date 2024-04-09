@@ -1,5 +1,7 @@
 FROM node
 
-COPY fightbots.js /fightbots.js
+WORKDIR /usr/src/app
 
-ENTRYPOINT [ "node" ]
+COPY fightbots.js .
+RUN npm install chess.js
+
