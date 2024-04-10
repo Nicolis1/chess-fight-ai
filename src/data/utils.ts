@@ -1,5 +1,5 @@
 import { Chess } from 'chess.js';
-import { BotData } from './features/activeCodeSlice';
+import { BotData } from './api/bots';
 export const STARTER_CODE1 =
 	//comment for code formatting
 	`function getMove(position){
@@ -124,100 +124,5 @@ export async function simulateGames(
 	} catch (error) {
 		console.error(error);
 		callback({ success: false, error });
-	}
-}
-
-export async function fetchBots() {
-	const response = await fetch('/bots/all', {
-		method: 'GET',
-		cache: 'no-cache',
-	});
-	const jsonBots = JSON.parse(await response.json()).bots;
-	let botsForState: Array<BotData> = [];
-
-	for (let bot of jsonBots) {
-		botsForState.push({
-			id: bot.botid,
-			name: bot.name,
-			code: bot.code,
-		});
-	}
-	return botsForState;
-}
-
-export async function newBot(): Promise<BotData | null> {
-	try {
-		const resp = await fetch('/bots/new', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ code: STARTER_CODE2 }),
-		});
-
-		console.log(resp);
-		const response = JSON.parse(await resp.json());
-		// fetch the bots again so cache is ready for when you next open the drawer
-		fetch('/bots/all', {
-			method: 'GET',
-			cache: 'reload',
-		});
-		return {
-			id: response.bot_id,
-			name: response.name,
-			code: response.code,
-		};
-	} catch (error) {
-		console.error(error);
-		return null;
-	}
-}
-
-export async function fetchActiveUser() {
-	try {
-		const resp = await fetch('/users/active', {
-			method: 'GET',
-		});
-		const response = JSON.parse(await resp.json());
-		if (response.userid == null) {
-			return null;
-		}
-		return {
-			id: response.userid,
-			username: response.username,
-		};
-	} catch (error) {
-		console.error(error);
-		return null;
-	}
-}
-
-export type MatchData = any; // todo update this with proper type
-
-export type Tournament = {
-	challengeId: string;
-	matchData: MatchData[];
-	participants: string[];
-	scheduled: number;
-};
-
-export async function fetchTournaments(): Promise<Tournament[]> {
-	try {
-		const resp = await fetch('/challenges/tournaments', {
-			method: 'GET',
-		});
-		const tournamentsForReturn: Tournament[] = [];
-		for (let tournament of JSON.parse(await resp.json())?.challenges) {
-			tournamentsForReturn.push({
-				challengeId: tournament.challengeid,
-				matchData: tournament.match_data,
-				participants: tournament.participants,
-				scheduled: tournament.scheduled,
-			});
-		}
-		return tournamentsForReturn;
-	} catch (error) {
-		console.error(error);
-		return [];
 	}
 }

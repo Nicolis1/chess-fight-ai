@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 from uuid import uuid4
 import time
+import simulate_challenge
+
 
 
 dotenv_path = Path('../.env.local')
@@ -81,7 +83,7 @@ def load_user(user_id):
 def login():
     username = request.form['username']
     password = request.form['password']
-    
+    # I dont think this is actually checking the password
     user_data = userCollection.find_one({'username': username})
     if(user_data and password):
         user = User.from_user_data(user_data)
@@ -90,6 +92,8 @@ def login():
             flash('Logged in successfully.')
             print(session)
             return redirect('/editor')
+        else:
+            return parse_json({"error":"bad login"})
     
     return redirect('/login/tryagain')
 
@@ -138,23 +142,25 @@ def get_item(user_id):
       
 @app.route('/users/new', methods=['POST'])
 def new_user():
-    data = request.json
-    if data["username"] != None and data["email"] != None and data["password"] != None:
-        user_id = uuid4().hex
+    username = request.form['username']
+    password = request.form['password']
+    confirm = request.form['confirmpassword']
+
+    user_id = uuid4().hex
+    if username and password and confirm and password==confirm:
+      
         bot_id = uuid4().hex
-        item_id = userCollection.insert_one({
-            "username":data["username"],
-            "email":data["email"],
-            "password":hashpw(data["password"].encode('utf-8'), gensalt()), 
+        userCollection.insert_one({
+            "username":username,
+            "password":hashpw(password.encode('utf-8'), gensalt()), 
             "bots":[bot_id],
             "userid":user_id
             }).inserted_id
-        
-     
-        #start new users with one bot
-        botCollection.insert_one({"code":"return moves.random()", "owner":user_id, "name":"New Bot",  "botid":bot_id})
-    return parse_json({'message': 'user added', 'item_id': str(item_id),}), 200
-
+        botCollection.insert_one({"code":"return position.moves()[0];", "owner":user_id, "name":"New Bot",  "botid":bot_id, "challengable":False})
+        user = User(username,password,user_id)
+        login_user(user)
+        flash('created successfully.')
+        return redirect('/editor')
 
 #Bots (maybe should be separate file?)
 @app.route('/bots/new', methods=['POST'])
@@ -188,18 +194,67 @@ def get_bots():
 def update_bot():
     bot_data = request.json
     modified = 0
+    # todo make sure bot is owned by current user
     try:
-        if bot_data["name"]!=None and bot_data["code"]!=None and bot_data["challengable"]:
-            print('code and name')
-            modified = botCollection.update_one({"botid":bot_data["botid"]},{"$set":{"code":bot_data["code"], "name":bot_data["name"], "challengable":bot_data["challengable"]}}).modified_count
-            print(modified)
-            print(bot_data["name"])
+        if bot_data["name"]!=None and bot_data["code"]!=None:
+            modified = botCollection.update_one({"botid":bot_data["botid"]},{"$set":{"code":bot_data["code"], "name":bot_data["name"]}}).modified_count
         if(modified == 0):
             return parse_json({'message': "nothing modified"}), 204
         else:
             return parse_json({"message": str(modified) +' bots updated'}), 200
     except:
         return parse_json({'error': "missing data"}), 400
+    
+@app.route('/bots/update/challenge', methods=['POST'])
+@login_required
+def update_bot_challenge():
+    data = request.json
+    modified = 0
+    # todo make sure bot is owned by current user
+    try:
+        if data["challengable"]!=None and data["botid"] != None:
+            modified = botCollection.update_one({"botid":data["botid"]},{"$set":{"challengable":data["challengable"]}}).modified_count
+        if(modified == 0):
+            return parse_json({"message": "nothing modified"}), 204
+        else:
+            return parse_json({"message": str(modified) +' bots updated'}), 200
+    except:
+        return parse_json({'error': "missing data"}), 400
+    
+@app.route('/bots/challengable', methods=['GET'])
+def get_challengable():
+    user_id = current_user.get_id()
+    if(user_id != None):
+        results = botCollection.aggregate([ {
+                    "$lookup": {
+                    "from": "users",
+                    "localField": "owner",
+                    "foreignField": "userid",
+                    "as": "userData"
+                    }
+                },
+                {
+                    "$match": {
+                    "owner": { "$ne": user_id }
+                    }
+                },
+                {
+                    "$project": {
+                    "_id": 0,
+                    "owner": 1, 
+                    "code":1,
+                    "name":1,
+                    "userData.username": 1, 
+                    "botid":1,
+                }}
+                ])
+      
+    else:
+        results = botCollection.find({"challengable": True,"owner":{"$ne":user_id}})
+    response = parse_json({"data":results})
+ 
+    return response, 200
+    
 #Challenges
 # here wwe will build the backend for 1:1 challenges, and tournaments
 @app.route('/challenges/tournaments/new', methods=['POST'])
@@ -254,6 +309,20 @@ def join_tournament():
     # todo, prevent the bot from being edited after it has joined the tournament (editible flag, make a copy?)
     challengesCollection.update_one({'challengeid': tournament_to_join}, {'$push':{"participants":bot_id}})
     return parse_json({'message':"successfully joined tournament"}), 200
+
+@app.route('/challenges/direct', methods=['POST'])
+@login_required
+def direct_challenge():
+    # data[botid, opponentbotid]
+    data = request.json
+    mybot = botCollection.find_one({"botid":data["botid"]})
+    opponentBot = botCollection.find_one({"botid":data["opponentid"] })
+    
+    #todo, verify mybot belongs to current user, opponent bot belongs to someone else, both are available for challenge
+
+    output = simulate_challenge.run_docker_container( mybot["code"], opponentBot["code"], mybot['botid'],opponentBot["botid"],)
+    print(output)
+    return output.decode('utf-8'), 200
 
 
 def parse_json(data):

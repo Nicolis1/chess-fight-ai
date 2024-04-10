@@ -10,45 +10,6 @@
     overflow-y: hidden;
     border-right:1px solid black;
 }
-
-.titleBar{
-    height:30px;
-    padding: 4px;
-    font-weight: bold;
-    border-bottom: 1px solid black;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    background-color: #FCEFE6;
-}
-.titleBar span{
-    font-size: 24px;
-    font-weight: bold;
-    padding-right: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-wrap: nowrap;
-    width: 100%;
-    
-}
-.titleBar .displayTitle{
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    cursor: text;
-    
-}
-.editorButtons{
-    width: 110px;
-    display: flex;
-    flex-direction: row;
-}
-.editorButtons *{
-    padding: 5px;
-}
-.react-tooltip{
-    z-index: 5;
-}
 .debugger{
     width:fit-content;
     height:100%;
@@ -75,4 +36,45 @@
     border: none;
     border-bottom: 1px solid black;
     height:50px;
+    max-width: 200px;
+}
+.titleBar{
+    display: flex;
+    justify-content: space-between;
+    background-color: #EFEEEA;
+    border-bottom:1px solid black ;
+}
+.displayTitle{
+    font-size: 2em;
+    font-weight: bold;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.displayTitle:hover{
+    cursor: text;
+}
+.displayTitle .icon-pencil{
+    float: right;
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+.displayTitle .icon-pencil:hover{
+    cursor: pointer; 
+}
+.titleBar input{
+    width:100%; 
+}
+.titleBar .editorButtons{
+    display: flex;
+    flex-direction: row;
+    height: 50%;
+    align-self: center;
+    padding: 4px;
+
+}
+.titleBar .editorButtons *{
+    font-size: 24px;
 }

@@ -1,21 +1,19 @@
-// todo add to requirements in dockerfile
 const { Chess } = require('chess.js');
-console.log(Chess);
-const bots = process.argv.slice(2);
-const bot1Code = bots[0].split('=')[1];
-const bot2Code = bots[1].split('=')[1];
-console.log(bot1Code);
-console.log(bot2Code);
-if (bot1Code === '' || bot2Code === '') {
-	console.log(JSON.stringify({ error: 'Missing bot code' }));
-}
-console.log(JSON.stringify(simulateGames(bot1Code, bot2Code)));
 
-function simulateGames(bot1Code, bot2Code) {
-	const maxMoves = 50;
+const args = process.argv.slice(2);
+
+const bot1Code = args[0].slice(args[0].indexOf('=') + 1);
+const bot2Code = args[1].slice(args[1].indexOf('=') + 1);
+const bot1Id = args[2].split('=')[1];
+const bot2Id = args[3].split('=')[1];
+
+console.log(JSON.stringify(simulateGames(bot1Code, bot2Code, bot1Id, bot2Id)));
+
+function simulateGames(bot1Code, bot2Code, bot1Id, bot2Id) {
+	const maxMoves = 100;
 	try {
 		const games = [];
-		for (let i = 0; i < 1; i++) {
+		for (let i = 0; i < 101; i++) {
 			games.push({
 				bot1Color: Math.random() < 0.5 ? 'w' : 'b',
 				board: new Chess(),
@@ -24,11 +22,10 @@ function simulateGames(bot1Code, bot2Code) {
 
 		const decisionFunction = new Function('position', bot1Code);
 		const opponentDecisionFunction = new Function('position', bot2Code);
-		for (let i = 0; i < maxMoves * 2; i++) {
+		for (let i = 0; i < maxMoves; i++) {
 			for (let game of games) {
-				// console.log(game.moveNumber());
-				if (game.board.moveNumber() < 100 && !game.board.isGameOver()) {
-					if (game.board.turn() === game.playerColor) {
+				if (game.board.moveNumber() < maxMoves && !game.board.isGameOver()) {
+					if (game.board.turn() === game.bot1Color) {
 						game.board.move(decisionFunction(game.board));
 					} else {
 						game.board.move(opponentDecisionFunction(game.board));
@@ -41,7 +38,7 @@ function simulateGames(bot1Code, bot2Code) {
 			let winner = null;
 			if (game.board.isCheckmate()) {
 				// the winner is whoever's turn it isn't on the last turn
-				winner = game.board.turn() === 'w' ? 'b' : 'w';
+				winner = game.board.turn() === game.bot1Color ? bot2Id : bot1Id;
 			}
 			results.push({
 				winner,
@@ -49,15 +46,16 @@ function simulateGames(bot1Code, bot2Code) {
 				turns: game.board.moveNumber(),
 				reachedMoveLimit: game.board.moveNumber() > maxMoves,
 				moves: game.board.history(),
-				bot1Color: game.bot1Color,
+				whitePieces: game.bot1Color === 'w' ? bot1Id : bot2Id,
 			});
 		}
 		return {
-			success: true,
-			results,
+			output: {
+				success: true,
+				results,
+			},
 		};
 	} catch (error) {
-		console.error(error);
-		return { success: false, error };
+		return { output: { success: false, error, bot1Code, bot2Code } };
 	}
 }

@@ -1,13 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
+import type { BotData } from '../api/bots.ts';
 interface ActiveCodeState {
 	value: BotData | null;
 }
-export type BotData = {
-	id?: string | undefined;
-	code?: string | undefined;
-	name?: string | undefined;
-};
+
 const initialState: ActiveCodeState = { value: null };
 export const activeCodeDataSlice = createSlice({
 	name: 'setActiveCodeData',

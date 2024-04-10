@@ -21,8 +21,6 @@ function CreateAccountModalContent() {
 	};
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
-
 		if (
 			formData.username.length < 3 ||
 			formData.password.length < 3 ||
@@ -30,13 +28,8 @@ function CreateAccountModalContent() {
 			formData.password !== formData.confirmpassword
 		) {
 			setError('Please enter email, username, and password.');
-			return;
-		}
-
-		try {
-			// todo, create new user
-		} catch (error) {
-			setError(error.message);
+			e.preventDefault();
+			return false;
 		}
 	};
 
@@ -44,7 +37,12 @@ function CreateAccountModalContent() {
 		<div>
 			<h2>Create Account</h2>
 			<div>
-				<form onSubmit={handleSubmit} className='login-container'>
+				<form
+					action='/users/new'
+					onSubmit={handleSubmit}
+					className='login-container'
+					method='POST'
+				>
 					<input
 						type='text'
 						name='username'

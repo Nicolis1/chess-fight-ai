@@ -7,7 +7,7 @@ import NewBot from '../Button/NewBot.tsx';
 import { useSelector } from 'react-redux';
 import BotSelections from './BotSelections.tsx';
 import React from 'react';
-import { ActiveCodeState } from '../../data/stores/dataStore.ts';
+import { ActiveState } from '../../data/stores/dataStore.ts';
 
 export default function SideNav(props) {
 	const [collapsed, setCollapsed] = useState(true);
@@ -15,7 +15,7 @@ export default function SideNav(props) {
 		setCollapsed(!collapsed);
 	}, [collapsed]);
 	const activeCodeID = useSelector(
-		(state: ActiveCodeState) => state.activeCode.value,
+		(state: ActiveState) => state.activeCode.value,
 	);
 
 	useEffect(() => {

@@ -7,22 +7,21 @@ import { javascript } from '@codemirror/lang-javascript';
 import Button from '../../components/Button/Button.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
-import {
-	fetchActiveUser,
-	fetchBots,
-	newBot,
-	simulateGames,
-} from '../../data/utils.ts';
+import { simulateGames } from '../../data/utils.ts';
 import TestResults from '../../components/TestResults/TestResultsTable.tsx';
 import { Tooltip } from 'react-tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
-import {
-	setActiveCodeData,
-	type BotData,
-} from '../../data/features/activeCodeSlice.ts';
+import { setActiveCodeData } from '../../data/features/activeCodeSlice.ts';
 import type { ActiveState } from '../../data/stores/dataStore.ts';
 import { setActiveUser } from '../../data/features/activeUserSlice.ts';
+import {
+	BotData,
+	fetchBots,
+	newBot,
+	postBotChallenable,
+} from '../../data/api/bots.ts';
+import { fetchActiveUser } from '../../data/api/users.ts';
 function EditorPage() {
 	const activeCodeData = useSelector(
 		(state: ActiveState) => state.activeCode.value,
@@ -73,7 +72,7 @@ function EditorPage() {
 				setSelectedTestOpponentData(bots[0]);
 			}
 		})();
-	}, [activeCodeData, activeUser, dispatch]);
+	}, [dispatch]);
 
 	const onChange = (code: string) => {
 		setBotData({ ...botData, code });
@@ -99,7 +98,6 @@ function EditorPage() {
 			botData.id != null &&
 			botData.name != null
 		) {
-			// todo, save updates to code
 			const resp = await fetch('/bots/update', {
 				method: 'POST',
 				headers: {
@@ -116,6 +114,25 @@ function EditorPage() {
 			alert('Nothing to save');
 		}
 	};
+
+	const toggleChallengeable = () => {
+		let updatedState = botData?.challengable !== true;
+
+		if (botData?.id) {
+			setBotData({ ...botData, challengable: updatedState });
+
+			postBotChallenable(botData?.id, updatedState).then((success) => {
+				if (success) {
+					dispatch(setActiveCodeData(botData));
+				} else {
+					// todo better error handling
+					alert('error updating bot visibility');
+					setBotData({ ...botData, challengable: !updatedState });
+				}
+			});
+		}
+	};
+
 	const playMoves = (moves) => {
 		const movesClone = [...moves];
 		if (intervalID != null) {
@@ -140,8 +157,10 @@ function EditorPage() {
 
 	return (
 		<div className='container'>
+			<Tooltip id='editor-button-edit-name' />
 			<Tooltip id='editor-button-run' />
 			<Tooltip id='editor-button-submit' />
+			<Tooltip id='editor-button-challengable' />
 
 			<SideNav />
 			<div className='editorSection'>
@@ -175,8 +194,14 @@ function EditorPage() {
 								setEditingTitle(true);
 							}}
 						>
-							<span>{botData?.name}</span>
-							{hoveringTitle && <Button icon={'icon-pencil'} />}
+							{hoveringTitle && (
+								<span
+									data-tooltip-content={'Edit name'}
+									data-tooltip-id={'editor-button-edit-name'}
+									className='icon-pencil'
+								/>
+							)}
+							{botData?.name}
 						</div>
 					)}
 
@@ -192,6 +217,16 @@ function EditorPage() {
 							onClick={submitChanges}
 							tooltipID={'editor-button-submit'}
 							tooltipContent={'Submit'}
+						/>
+						<Button
+							icon={botData?.challengable ? 'icon-support' : 'icon-target'}
+							onClick={toggleChallengeable}
+							tooltipID={'editor-button-challengable'}
+							tooltipContent={
+								botData?.challengable
+									? 'Make bot private'
+									: 'Allow others to challenge your bot'
+							}
 						/>
 					</div>
 				</div>
@@ -211,6 +246,7 @@ function EditorPage() {
 				<div className='testOutput'>
 					<div className='title'>
 						<h1 id='opponentBotTitle'>Test Vs.</h1>
+						{/*todo known bug, opponent title is too long wrecks layout - limit display length */}
 						<select
 							name='opponentBot'
 							aria-labelledby='opponentBotTitle'

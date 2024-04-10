@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import {
-	BotData,
-	setActiveCodeData,
-} from '../../data/features/activeCodeSlice.ts';
+import { setActiveCodeData } from '../../data/features/activeCodeSlice.ts';
 import { useDispatch } from 'react-redux';
 import Button from '../Button/Button.tsx';
 import { useSelector } from 'react-redux';
 import React from 'react';
-import { ActiveCodeState } from '../../data/stores/dataStore.ts';
-import { fetchBots } from '../../data/utils.ts';
+import { ActiveState } from '../../data/stores/dataStore.ts';
+import { BotData, fetchBots } from '../../data/api/bots.ts';
 
 export default function BotSelections(props) {
 	const dispatch = useDispatch();
 	const activeCode = useSelector(
-		(state: ActiveCodeState) => state.activeCode.value,
+		(state: ActiveState) => state.activeCode.value,
 	);
 
 	const [myBots, setMyBots] = useState<Array<BotData>>([]);
