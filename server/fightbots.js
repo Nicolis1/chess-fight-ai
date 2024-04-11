@@ -44,7 +44,7 @@ function simulateGames(bot1Code, bot2Code, bot1Id, bot2Id) {
 				winner,
 				draw: game.board.isDraw(),
 				turns: game.board.moveNumber(),
-				reachedMoveLimit: game.board.moveNumber() > maxMoves,
+				reachedMoveLimit: game.board.moveNumber() > maxMoves / 2,
 				moves: game.board.history(),
 				whitePieces: game.bot1Color === 'w' ? bot1Id : bot2Id,
 			});

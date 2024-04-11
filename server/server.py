@@ -235,7 +235,8 @@ def get_challengable():
                 },
                 {
                     "$match": {
-                    "owner": { "$ne": user_id }
+                    "owner": { "$ne": user_id },
+                    "challengable":True
                     }
                 },
                 {
@@ -246,6 +247,7 @@ def get_challengable():
                     "name":1,
                     "userData.username": 1, 
                     "botid":1,
+                    "challengable":1
                 }}
                 ])
       
@@ -319,10 +321,14 @@ def direct_challenge():
     opponentBot = botCollection.find_one({"botid":data["opponentid"] })
     
     #todo, verify mybot belongs to current user, opponent bot belongs to someone else, both are available for challenge
+        
 
     output = simulate_challenge.run_docker_container( mybot["code"], opponentBot["code"], mybot['botid'],opponentBot["botid"],)
     print(output)
-    return output.decode('utf-8'), 200
+    #returns result:{output:{}}, maybe simplify?
+    response = parse_json({"result":output.decode('utf-8')})
+    
+    return response, 200
 
 
 def parse_json(data):

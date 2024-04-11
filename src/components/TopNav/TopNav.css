@@ -15,7 +15,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-   align-items: center;
+    align-items: center;
 }
 .topNav>.main-content{
     display: flex;
@@ -36,4 +36,5 @@
 .rightContent{
     color: white;
     width: fit-content;
+    padding-right: 10px;
 }

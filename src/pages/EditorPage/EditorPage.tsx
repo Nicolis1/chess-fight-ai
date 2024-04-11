@@ -8,7 +8,9 @@ import Button from '../../components/Button/Button.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
 import { simulateGames } from '../../data/utils.ts';
-import TestResults from '../../components/TestResults/TestResultsTable.tsx';
+import TestResults, {
+	Result,
+} from '../../components/TestResults/TestResultsTable.tsx';
 import { Tooltip } from 'react-tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
@@ -29,7 +31,7 @@ function EditorPage() {
 	const activeUser = useSelector(
 		(state: ActiveState) => state.activeUser.value,
 	);
-	const [results, setResults] = useState(null);
+	const [results, setResults] = useState<Result[] | null>(null);
 	const [calculating, setCalculating] = useState(false);
 	const [displayFen, setDisplayFen] = useState(new Chess().fen());
 	const [intervalID, setIntervalID] = useState<NodeJS.Timeout | null>(null);
@@ -58,24 +60,27 @@ function EditorPage() {
 					}
 				});
 			}
-			const bots = await fetchBots();
-			if (activeCodeData) {
-				setBotData(activeCodeData);
-			} else if (bots.length > 0) {
-				dispatch(setActiveCodeData(bots[0]));
-			} else {
-				const bot = await newBot();
-				if (bot) dispatch(setActiveCodeData(bot));
-			}
-			if (bots.length > 0) {
-				setAllBots(bots);
-				setSelectedTestOpponentData(bots[0]);
-			}
+			// todo this fetchbots function is called 6 times on editor load, add a debouncer to the api calls.
+			fetchBots().then((bots) => {
+				if (activeCodeData) {
+					setBotData(activeCodeData);
+				} else if (bots.length > 0) {
+					dispatch(setActiveCodeData(bots[0]));
+				} else {
+					newBot().then((bot) => {
+						if (bot) dispatch(setActiveCodeData(bot));
+					});
+				}
+				if (bots.length > 0) {
+					setAllBots(bots);
+					setSelectedTestOpponentData(bots[0]);
+				}
+			});
 		})();
-	}, [dispatch]);
+	}, [dispatch, activeUser, activeCodeData]);
 
 	const onChange = (code: string) => {
-		setBotData({ ...botData, code });
+		if (botData?.id) setBotData({ ...botData, code });
 	};
 
 	const finishSimulation = (results) => {
@@ -86,7 +91,13 @@ function EditorPage() {
 		if (botData && botData.code != null) {
 			setCalculating(true);
 
-			simulateGames(activeCodeData, selectedTestOpponentData, finishSimulation);
+			simulateGames(activeCodeData, selectedTestOpponentData)
+				.then((response) => {
+					setResults(response);
+				})
+				.finally(() => {
+					setCalculating(false);
+				});
 		} else {
 			alert('Nothing to run');
 		}
@@ -180,7 +191,8 @@ function EditorPage() {
 							value={botData?.name}
 							placeholder='Untitled Bot'
 							onChange={(e) => {
-								setBotData({ ...botData, name: e.target.value });
+								if (botData?.id)
+									setBotData({ ...botData, name: e.target.value });
 							}}
 							onBlur={() => {
 								setEditingTitle(false);
@@ -246,7 +258,6 @@ function EditorPage() {
 				<div className='testOutput'>
 					<div className='title'>
 						<h1 id='opponentBotTitle'>Test Vs.</h1>
-						{/*todo known bug, opponent title is too long wrecks layout - limit display length */}
 						<select
 							name='opponentBot'
 							aria-labelledby='opponentBotTitle'
@@ -269,8 +280,12 @@ function EditorPage() {
 						</select>
 					</div>
 					{calculating && 'calculating'}
-					{results != null && (
-						<TestResults response={results} playMoves={playMoves} />
+					{results != null && activeCodeData && (
+						<TestResults
+							results={results}
+							playMoves={playMoves}
+							playerId={activeCodeData.id}
+						/>
 					)}
 				</div>
 			</div>

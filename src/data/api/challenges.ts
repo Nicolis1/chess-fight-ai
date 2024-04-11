@@ -27,3 +27,24 @@ export async function fetchTournaments(): Promise<Tournament[]> {
 		return [];
 	}
 }
+
+export async function challengeBot(botId: string, opponentBotId: string) {
+	try {
+		const resp = await fetch('/challenges/direct', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ botid: botId, opponentid: opponentBotId }),
+		});
+		console.log(resp);
+		const result = JSON.parse(await resp.json());
+		console.log(result);
+		const jsonResult = JSON.parse(result.result);
+		// todo, output from this api call is too nested
+		return jsonResult.output.results;
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
+}

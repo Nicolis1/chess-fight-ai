@@ -2,12 +2,16 @@ import { useState, useCallback } from 'react';
 import './TestResult.css';
 import React from 'react';
 
-function TestResult(props) {
+function TestResult(props: {
+	data: Result;
+	playerId: string;
+	playMoves: Function;
+}) {
 	const [showDetails, setShowDetails] = useState(false);
 	let outcome: string | null = null;
 	if (props.data.reachedMoveLimit || props.data.draw) {
 		outcome = 'Draw';
-	} else if (props.data.winner === true) {
+	} else if (props.data.winner === props.playerId) {
 		outcome = 'Win';
 	} else {
 		outcome = 'Loss';
@@ -17,11 +21,16 @@ function TestResult(props) {
 		props.playMoves(props.data.moves);
 	}, [props]);
 
+	let playerPieces = 'white';
+	if (props.data.whitePieces !== props.playerId) {
+		playerPieces = 'black';
+	}
+
 	return (
 		<div className='testResult'>
 			<div className='resultContainer'>
 				<div>
-					<span className={outcome}>{outcome}</span> in{' '}
+					<span className={outcome}>{outcome}</span> in
 					{`${props.data.turns} moves`}
 				</div>
 				<button
@@ -36,7 +45,7 @@ function TestResult(props) {
 			{showDetails && (
 				<div>
 					<div>
-						with the {props.data.playerColor === 'w' ? 'white' : 'black'} pieces{' '}
+						with the {playerPieces} pieces
 						<button className='playMoves' onClick={playMoves}>
 							Play Moves
 						</button>
@@ -46,26 +55,29 @@ function TestResult(props) {
 		</div>
 	);
 }
-
-export default function TestResults(props) {
-	if (props.response?.success) {
-		let resultComponents = props.response.results.map((result, index) => {
-			return (
-				<TestResult
-					key={'result' + index}
-					data={result}
-					playMoves={props.playMoves}
-				/>
-			);
-		});
-		return <div>{resultComponents}</div>;
-	} else {
-		// there was an error
+export type Result = {
+	draw: boolean;
+	moves: string[];
+	turns: number;
+	whitePieces: string;
+	winner: string | null;
+	reachedMoveLimit: boolean;
+};
+export default function TestResults(props: {
+	results: Result[] | null;
+	playMoves: Function;
+	playerId: string;
+}) {
+	if (!props.results) return null;
+	let resultComponents = props.results.map((result, index) => {
 		return (
-			<div>
-				<div className='resultsTitle'>Results</div>
-				{JSON.stringify(props.response.error)}
-			</div>
+			<TestResult
+				key={'result' + index}
+				data={result}
+				playMoves={props.playMoves}
+				playerId={props.playerId}
+			/>
 		);
-	}
+	});
+	return <div>{resultComponents}</div>;
 }

@@ -1,5 +1,5 @@
 export type BotData = {
-	id?: string | undefined;
+	id: string;
 	code?: string | undefined;
 	name?: string | undefined;
 	challengable?: boolean;
@@ -87,7 +87,6 @@ export async function fetchBots() {
 	});
 	const jsonBots = JSON.parse(await response.json()).bots;
 	let botsForState: Array<BotData> = [];
-
 	for (let bot of jsonBots) {
 		botsForState.push({
 			id: bot.botid,

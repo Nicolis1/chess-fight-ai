@@ -1,5 +1,6 @@
 import { Chess } from 'chess.js';
 import { BotData } from './api/bots';
+import { Result } from '../components/TestResults/TestResultsTable';
 export const STARTER_CODE1 =
 	//comment for code formatting
 	`function getMove(position){
@@ -42,27 +43,10 @@ type Game = {
 	playerColor: string;
 	board: Chess;
 };
-type SimulatedGame = {
-	winner: boolean | null;
-	draw: boolean;
-	turns: number;
-	reachedMoveLimit: boolean;
-	moves: Array<string>;
-	playerColor: string;
-};
 export async function simulateGames(
 	botData: BotData | null,
 	opponentData: BotData | null,
-	callback: {
-		(results: any): void;
-		(arg0: {
-			success: boolean;
-			opponent?: string;
-			results?: SimulatedGame[];
-			error?: any;
-		}): void;
-	},
-) {
+): Promise<Result[] | null> {
 	const maxMoves = 50;
 	try {
 		const games: Array<Game> = [];
@@ -72,14 +56,13 @@ export async function simulateGames(
 				board: new Chess(),
 			});
 		}
-		if (botData?.code == null) {
-			callback({ success: false, error: 'no selected bot code' });
-			return;
+		if (botData?.code == null || opponentData?.code == null) {
+			return null;
 		}
 		// new Function call's eval on user submitted code, this is potentially dangerous
 		// eslint-disable-next-line no-new-func
 		const decisionFunction = new Function('position', botData.code);
-		const opponentDecisionFunction = opponentData?.code
+		const opponentDecisionFunction = opponentData.code
 			? // eslint-disable-next-line no-new-func
 			  new Function('position', opponentData.code)
 			: null;
@@ -93,19 +76,18 @@ export async function simulateGames(
 					} else {
 						if (opponentDecisionFunction) {
 							game.board.move(opponentDecisionFunction(game.board));
-						} else {
-							game.board.move(testBot(game.board));
 						}
 					}
 				}
 			}
 		}
-		const results: Array<SimulatedGame> = [];
+		const results: Result[] = [];
 		for (let game of games) {
-			let winner: boolean | null = null;
+			let winner: string | null = null;
 			if (game.board.isCheckmate()) {
 				// the winner is whoever's turn it isn't on the last turn
-				winner = game.board.turn() !== game.playerColor;
+				winner =
+					game.board.turn() === game.playerColor ? opponentData.id : botData.id;
 			}
 			results.push({
 				winner,
@@ -113,16 +95,12 @@ export async function simulateGames(
 				turns: game.board.moveNumber(),
 				reachedMoveLimit: game.board.moveNumber() > maxMoves,
 				moves: game.board.history(),
-				playerColor: game.playerColor,
+				whitePieces: game.playerColor === 'w' ? botData.id : opponentData.id,
 			});
 		}
-		callback({
-			success: true,
-			opponent: opponentData ? opponentData.name : 'TestBot',
-			results,
-		});
+		return results;
 	} catch (error) {
 		console.error(error);
-		callback({ success: false, error });
+		return null;
 	}
 }
