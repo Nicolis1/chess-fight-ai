@@ -1,0 +1,82 @@
+.modalContainer{
+    position: absolute;
+    height: 70%;
+    width:600px;
+    background-color: azure;
+    left:50%;
+    transform: translate(-50%, 0);
+    top:50px;
+    border:1px solid black;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+}
+.modalTitle{
+    display: flex;
+    justify-content: space-between;
+}
+.modalTitle .close{
+    font-size: 2em;
+    background-color: inherit;
+    border:none
+}
+.modalTitle .close:hover{
+    font-size: 2.5em;
+    cursor: pointer;
+    width:50px
+}
+.botsToSelect{
+    height: 100%;
+    overflow: auto;
+    cursor: pointer;
+}
+.botToSelect{
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px;
+    background-color: #B58863;
+}
+.botToSelect:nth-child(even){
+    background-color: #F0D9B5;
+}
+.botToSelect:hover{
+    background-color: #FFFAAF;
+}
+.botToSelect.selected{
+    background-color: #4F4F4F;
+}
+.botToSelect{
+    border-bottom:1px solid #999;
+}
+
+.footerButtons{
+    display: flex;
+    justify-content: space-between;
+}
+.footerButtons button{
+    height:40px;
+    background-color: inherit;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 8px;
+    font-size: 16px;
+}
+button.cancel{
+    background-color: #C61A09;
+    width: 100px;
+}
+button.cancel:hover{
+    background-color: red;
+}
+button.select{
+    text-wrap: nowrap;
+    width: 100%;
+    background-color: #03C04A;
+}
+button.select:hover{
+    background-color:#08F26E;
+}

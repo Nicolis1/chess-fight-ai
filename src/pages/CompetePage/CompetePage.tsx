@@ -18,7 +18,9 @@ import TestResults, {
 } from '../../components/TestResults/TestResultsTable.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
-import BotSelectionModal from '../../components/BotSelectionModal/BotSelectionModal.tsx';
+import BotSelectionModal, {
+	ChallengeEvent,
+} from '../../components/BotSelectionModal/BotSelectionModal.tsx';
 
 function TournamentElement(
 	props: Tournament & { name: string; eligibleBots: BotData[] },
@@ -29,6 +31,7 @@ function TournamentElement(
 		<div key={props.challengeId} className='tournament'>
 			<div>
 				<BotSelectionModal
+					forEvent={ChallengeEvent.Tournament}
 					displayModal={displayModal}
 					bots={props.eligibleBots}
 					onSelect={(selectedBot) => {
@@ -74,6 +77,7 @@ function ChallengeElement(props: {
 	return (
 		<div key={props.id} className='challenge'>
 			<BotSelectionModal
+				forEvent={ChallengeEvent.Challenge}
 				displayModal={displayModal}
 				bots={props.eligibleBots}
 				onSelect={(selectedBot) => {
@@ -159,10 +163,15 @@ function CompetePage() {
 		);
 	});
 	const botComponents = (challengableBots || []).map((bot) => {
+		if (!bot.name || !bot.ownerName || !bot.code) {
+			return null;
+		}
 		return (
 			<ChallengeElement
 				key={bot.id}
-				name={bot.name}
+				name={`${bot.name?.substring(0, 15)}${
+					bot.name?.length > 15 ? '...' : ''
+				}`}
 				id={bot.id}
 				owner={bot.ownerName}
 				code={bot.code}

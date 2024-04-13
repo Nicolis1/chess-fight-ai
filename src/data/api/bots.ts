@@ -1,7 +1,7 @@
 export type BotData = {
 	id: string;
 	code?: string | undefined;
-	name?: string | undefined;
+	name: string;
 	challengable?: boolean;
 	ownerName?: string;
 };
