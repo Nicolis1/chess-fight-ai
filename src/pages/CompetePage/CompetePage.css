@@ -1,3 +1,8 @@
+.challengePage{
+    height: 100%;
+    background-color: #EFEEEA;
+
+}
 .tournamentWrapper{
     display: flex;
     justify-content: space-evenly;

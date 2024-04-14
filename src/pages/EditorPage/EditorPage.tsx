@@ -109,7 +109,7 @@ function EditorPage() {
 			botData.id != null &&
 			botData.name != null
 		) {
-			const resp = await fetch('/bots/update', {
+			fetch('/bots/update', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -120,7 +120,6 @@ function EditorPage() {
 					code: botData.code,
 				}),
 			});
-			console.log(resp);
 		} else {
 			alert('Nothing to save');
 		}

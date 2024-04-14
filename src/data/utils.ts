@@ -69,7 +69,6 @@ export async function simulateGames(
 
 		for (let i = 0; i < maxMoves * 2; i++) {
 			for (let game of games) {
-				// console.log(game.moveNumber());
 				if (game.board.moveNumber() < 100 && !game.board.isGameOver()) {
 					if (game.board.turn() === game.playerColor) {
 						game.board.move(decisionFunction(game.board));

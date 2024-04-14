@@ -7,6 +7,7 @@ import {
 	Tournament,
 	challengeBot,
 	fetchTournaments,
+	joinTournament,
 } from '../../data/api/challenges.ts';
 import { BotData, fetchBots, fetchChallengable } from '../../data/api/bots.ts';
 import { fetchActiveUser } from '../../data/api/users.ts';
@@ -27,6 +28,8 @@ function TournamentElement(
 ) {
 	const [displayModal, setDisplayModal] = useState(false);
 	const [participants, setParticipants] = useState(props.participants);
+	console.log('cid ', props.challengeId);
+	console.log('participants ', props.participants);
 	return (
 		<div key={props.challengeId} className='tournament'>
 			<div>
@@ -35,8 +38,8 @@ function TournamentElement(
 					displayModal={displayModal}
 					bots={props.eligibleBots}
 					onSelect={(selectedBot) => {
-						setParticipants([selectedBot.name, ...participants]);
-						console.log('I will join tournament with ', selectedBot);
+						setParticipants([selectedBot, ...participants]);
+						joinTournament(selectedBot.id, props.challengeId);
 					}}
 					hideModal={() => {
 						setDisplayModal(false);
@@ -47,8 +50,12 @@ function TournamentElement(
 				<div>{new Date(props.scheduled * 1000).toDateString()}</div>
 				<div>{participants.length} participants so far</div>
 				<div>
-					{participants.slice(0, 3).map((particpant) => {
-						return <div>{particpant}</div>;
+					{participants.slice(0, 3).map((participant) => {
+						return (
+							<div>
+								{participant.name} by {participant.ownerName}
+							</div>
+						);
 					})}
 					{participants.length > 3 && '...'}
 				</div>
@@ -82,7 +89,6 @@ function ChallengeElement(props: {
 				bots={props.eligibleBots}
 				onSelect={(selectedBot) => {
 					props.onChallenge(selectedBot);
-					console.log('I will cahllenge ', props.name, ' with ', selectedBot);
 				}}
 				hideModal={() => {
 					setDisplayModal(false);
@@ -109,7 +115,6 @@ function CompetePage() {
 	const activeUser = useSelector(
 		(state: ActiveState) => state.activeUser.value,
 	);
-	const activeBot = useSelector((state: ActiveState) => state.activeCode.value);
 	const [tournaments, setTournaments] = useState<Tournament[] | null>(null);
 	const [challengableBots, setChallengableBots] = useState<BotData[] | null>(
 		null,
@@ -140,7 +145,6 @@ function CompetePage() {
 				setTournaments(tournaments);
 			});
 			fetchChallengable().then((bots) => {
-				console.log(bots);
 				setChallengableBots(bots);
 			});
 
@@ -152,16 +156,18 @@ function CompetePage() {
 		})();
 	}, [dispatch]);
 
-	const tournamentComponents = (tournaments || []).map((tournament, index) => {
-		return (
-			<TournamentElement
-				key={tournament.challengeId}
-				name={`weekly tournament ${index + 1}`}
-				eligibleBots={myBots || []}
-				{...tournament}
-			/>
-		);
-	});
+	const tournamentComponents = (tournaments || []).map(
+		(tournament: Tournament, index) => {
+			return (
+				<TournamentElement
+					key={tournament.challengeId}
+					name={`weekly tournament ${index + 1}`}
+					eligibleBots={myBots || []}
+					{...tournament}
+				/>
+			);
+		},
+	);
 	const botComponents = (challengableBots || []).map((bot) => {
 		if (!bot.name || !bot.ownerName || !bot.code) {
 			return null;
@@ -178,10 +184,7 @@ function CompetePage() {
 				eligibleBots={myBots || []}
 				onChallenge={(botForChallenge) => {
 					if (botForChallenge?.id && bot?.id) {
-						console.log(botForChallenge);
-						console.log('challenging...');
 						challengeBot(botForChallenge.id, bot.id).then((resp) => {
-							console.log('resoponse, ', resp);
 							setResults(resp);
 							setBotIdForChallenge(botForChallenge.id);
 						});
@@ -214,7 +217,7 @@ function CompetePage() {
 	};
 
 	return (
-		<div>
+		<div className='challengePage'>
 			<h1>Upcoming Tournaments!</h1>
 			<div className='tournamentWrapper'>{tournamentComponents}</div>
 			<hr />

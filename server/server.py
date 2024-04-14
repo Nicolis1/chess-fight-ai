@@ -183,7 +183,17 @@ def get_bots():
     user_id = current_user.get_id()
     user_data = userCollection.find_one({'userid':  user_id})
     if user_data != None:
-        results = botCollection.find({"botid": {"$in": user_data["bots"]}})
+        queryResult = botCollection.find({"botid": {"$in": user_data["bots"]}})
+        results = []
+        for doc in queryResult:
+            results.append({
+                "code":doc["code"],
+                "owner":current_user.username,
+                "name":doc["name"],
+                "botid":doc["botid"],
+                "challengable":doc["challengable"],
+                
+            })
         response = parse_json({"bots":results})
         response.headers['Cache-Control'] = 'max-age=3600'  
         return response, 200
@@ -264,7 +274,8 @@ def get_challengable():
 def new_tourney():
     data = request.json
     user_id = current_user.get_id()     
-    if(user_id != "249f9e289959496688520646f009e11c"):
+    if(user_id != "4f7ed09cccc4409d9404235d76e95bc1"):
+        print(user_id)
         return parse_json({'error':'must login as admin'}), 401
     
     challenge_id = uuid4().hex
@@ -293,18 +304,33 @@ def get_created_challenges():
 
 @app.route('/challenges/tournaments', methods=['GET'])
 def get_existing_tournaments():
-    existing_tournaments = challengesCollection.find({"type":"tournament"})
+    botCollection.find({})
+    existing_tournaments = challengesCollection.aggregate([
+  {
+    "$match": { "type": "tournament" } 
+  },
+  {
+    "$lookup": {
+      "from": "bots", 
+      "localField": "participants", 
+      "foreignField": "botid",
+      "as": "participantsData" 
+    }
+  }
+])
+
+    print(existing_tournaments)
     #todo add logic to return only upcoming and recently finished challenges
     return parse_json({'challenges':existing_tournaments}), 200
 
-@app.route('/challenges/tournaments', methods=['GET'])
+@app.route('/challenges/tournaments/join', methods=['POST'])
 @login_required
 def join_tournament():
     data = request.json
     tournament_to_join = data['tournament']
     bot_id= data['botid']
-    bot = botCollection.find({"botid": bot_id})
-    if(bot["owner"] != current_user.get_id):
+    bot = botCollection.find_one({"botid": bot_id})
+    if(bot["owner"] != current_user.get_id()):
         return parse_json({'error':'only the owner of a bot can add it to a tournament'}), 401
 
     # todo, confirm the tournament is in the future and this bot is eligible to join
@@ -319,15 +345,11 @@ def direct_challenge():
     data = request.json
     mybot = botCollection.find_one({"botid":data["botid"]})
     opponentBot = botCollection.find_one({"botid":data["opponentid"] })
-    
     #todo, verify mybot belongs to current user, opponent bot belongs to someone else, both are available for challenge
-        
-
     output = simulate_challenge.run_docker_container( mybot["code"], opponentBot["code"], mybot['botid'],opponentBot["botid"],)
     print(output)
     #returns result:{output:{}}, maybe simplify?
     response = parse_json({"result":output.decode('utf-8')})
-    
     return response, 200
 
 

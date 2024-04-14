@@ -36,7 +36,6 @@ export async function fetchChallengable(): Promise<BotData[]> {
 		});
 		const availableBots: BotData[] = [];
 		const result = JSON.parse(await resp.json()).data;
-		console.log(result);
 		for (let bot of result) {
 			availableBots.push({
 				id: bot.botid,
@@ -63,7 +62,6 @@ export async function newBot(): Promise<BotData | null> {
 			body: JSON.stringify({ code: 'return position.moves()[0]' }),
 		});
 
-		console.log(resp);
 		const response = JSON.parse(await resp.json());
 		// fetch the bots again so cache is ready for when you next open the drawer
 		fetch('/bots/all', {
@@ -93,6 +91,7 @@ export async function fetchBots() {
 			name: bot.name,
 			code: bot.code,
 			challengable: bot.challengable,
+			ownerName: bot.owner,
 		});
 	}
 	return botsForState;

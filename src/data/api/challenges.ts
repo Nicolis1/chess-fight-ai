@@ -1,9 +1,11 @@
+import { BotData } from './bots';
+
 export type MatchData = any; // todo update this with proper type
 
 export type Tournament = {
 	challengeId: string;
 	matchData: MatchData[];
-	participants: string[];
+	participants: BotData[];
 	scheduled: number;
 };
 
@@ -37,12 +39,29 @@ export async function challengeBot(botId: string, opponentBotId: string) {
 			},
 			body: JSON.stringify({ botid: botId, opponentid: opponentBotId }),
 		});
-		console.log(resp);
 		const result = JSON.parse(await resp.json());
-		console.log(result);
 		const jsonResult = JSON.parse(result.result);
 		// todo, output from this api call is too nested
 		return jsonResult.output.results;
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
+}
+
+export async function joinTournament(botId: string, tournamentId: string) {
+	try {
+		const resp = await fetch('/challenges/tournaments/join', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ botid: botId, tournament: tournamentId }),
+		});
+		console.log(resp);
+		const result = JSON.parse(await resp.json());
+		console.log(result);
+		return result;
 	} catch (error) {
 		console.error(error);
 		return [];
