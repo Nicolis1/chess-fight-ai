@@ -7,6 +7,8 @@ export type Tournament = {
 	matchData: MatchData[];
 	participants: BotData[];
 	scheduled: number;
+	type: string;
+	name: string;
 };
 
 export async function fetchTournaments(): Promise<Tournament[]> {
@@ -19,8 +21,18 @@ export async function fetchTournaments(): Promise<Tournament[]> {
 			tournamentsForReturn.push({
 				challengeId: tournament.challengeid,
 				matchData: tournament.match_data,
-				participants: tournament.participants,
+				participants: tournament.participantData.map((pData): BotData => {
+					return {
+						name: pData.botName,
+						id: pData.botid,
+						challengable: pData.challengable,
+						code: pData.code,
+						ownerName: pData.username,
+					};
+				}),
 				scheduled: tournament.scheduled,
+				type: tournament.type,
+				name: tournament.name,
 			});
 		}
 		return tournamentsForReturn;

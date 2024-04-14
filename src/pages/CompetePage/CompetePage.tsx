@@ -23,9 +23,7 @@ import BotSelectionModal, {
 	ChallengeEvent,
 } from '../../components/BotSelectionModal/BotSelectionModal.tsx';
 
-function TournamentElement(
-	props: Tournament & { name: string; eligibleBots: BotData[] },
-) {
+function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 	const [displayModal, setDisplayModal] = useState(false);
 	const [participants, setParticipants] = useState(props.participants);
 	console.log('cid ', props.challengeId);
@@ -52,7 +50,7 @@ function TournamentElement(
 				<div>
 					{participants.slice(0, 3).map((participant) => {
 						return (
-							<div>
+							<div className='participant'>
 								{participant.name} by {participant.ownerName}
 							</div>
 						);
@@ -161,7 +159,6 @@ function CompetePage() {
 			return (
 				<TournamentElement
 					key={tournament.challengeId}
-					name={`weekly tournament ${index + 1}`}
 					eligibleBots={myBots || []}
 					{...tournament}
 				/>

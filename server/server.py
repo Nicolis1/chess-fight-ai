@@ -279,7 +279,7 @@ def new_tourney():
         return parse_json({'error':'must login as admin'}), 401
     
     challenge_id = uuid4().hex
-    challengesCollection.insert_one({"type":"tournament", "match_data":[], "participants":[], "scheduled":data['time'],  "challengeid":challenge_id})
+    challengesCollection.insert_one({"type":"tournament","name":data["name"], "match_data":[], "participants":[], "scheduled":data['time'],  "challengeid":challenge_id})
     return parse_json({'message': 'tournament scheduled', 'challengeid': str(challenge_id), 'scheduled':data['time']}), 200
 
 @app.route('/challenges/direct/new', methods=['POST'])
@@ -306,20 +306,61 @@ def get_created_challenges():
 def get_existing_tournaments():
     botCollection.find({})
     existing_tournaments = challengesCollection.aggregate([
-  {
-    "$match": { "type": "tournament" } 
-  },
-  {
-    "$lookup": {
-      "from": "bots", 
-      "localField": "participants", 
-      "foreignField": "botid",
-      "as": "participantsData" 
-    }
-  }
-])
+        {
+            "$match": { "type": "tournament" } 
+        },
+        {
+            "$lookup": {
+            "from": "bots", 
+            "localField": "participants", 
+            "foreignField": "botid",
+            "as": "participantsData" 
+            }
+        },
+        { 
+            "$unwind": {
+            "path": "$participantsData",
+            "preserveNullAndEmptyArrays": True
+            }
+        },
+        {
+            "$lookup": {
+            "from": "users", 
+            "localField": "participantsData.owner", 
+            "foreignField": "userid",
+            "as": "userData" 
+            }
+        },
+        {
+            "$addFields": {
+                "participantData":{
+                    "$cond": {
+                    "if": { "$eq": [{ "$size": "$userData" }, 0] },
+                    "then": "$$REMOVE",
+                    "else": {
+                        "username":{"$first":"$userData.username"},
+                                    "botName":"$participantsData.name",
+                                    "code":"$participantsData.code",
+                                    "botid":"$participantsData.botid",
+                                    "challengable":"$participantsData.challengable"} ,
+                    }
+                }
+            }
+        },
+        {
+            "$group":{
+                "_id": "$_id",
+                "participantData":{"$push":"$participantData"},
+               "type":{"$first":"$type"},
+               "challengeid":{"$first":"$challengeid"},
+               "scheduled":{"$first":"$scheduled"},
+               "match_data":{"$first":"$match_data"},
+               "name":{"$first":"$name"},
+            }
+        },
+        { "$sort" : { "scheduled" : 1 } }
+    ])
 
-    print(existing_tournaments)
     #todo add logic to return only upcoming and recently finished challenges
     return parse_json({'challenges':existing_tournaments}), 200
 
