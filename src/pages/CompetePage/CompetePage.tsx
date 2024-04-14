@@ -14,14 +14,13 @@ import { fetchActiveUser } from '../../data/api/users.ts';
 import './CompetePage.css';
 import Button from '../../components/Button/Button.tsx';
 import { Tooltip } from 'react-tooltip';
-import TestResults, {
-	Result,
-} from '../../components/TestResults/TestResultsTable.tsx';
+import TestResults from '../../components/TestResults/TestResultsTable.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
 import BotSelectionModal, {
 	ChallengeEvent,
 } from '../../components/BotSelectionModal/BotSelectionModal.tsx';
+import { Result } from '../../components/ResultsPill/ResultsPill.tsx';
 
 function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 	const [displayModal, setDisplayModal] = useState(false);

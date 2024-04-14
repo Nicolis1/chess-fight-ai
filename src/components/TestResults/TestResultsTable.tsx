@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import './TestResult.css';
 import React from 'react';
+import ResultsPill, { Result } from '../ResultsPill/ResultsPill.tsx';
 
 function TestResult(props: {
 	data: Result;
@@ -55,14 +56,7 @@ function TestResult(props: {
 		</div>
 	);
 }
-export type Result = {
-	draw: boolean;
-	moves: string[];
-	turns: number;
-	whitePieces: string;
-	winner: string | null;
-	reachedMoveLimit: boolean;
-};
+
 export default function TestResults(props: {
 	results: Result[] | null;
 	playMoves: Function;
@@ -79,5 +73,10 @@ export default function TestResults(props: {
 			/>
 		);
 	});
-	return <div>{resultComponents}</div>;
+	return (
+		<div>
+			<ResultsPill results={props.results} protagonist={props.playerId} />
+			{resultComponents}
+		</div>
+	);
 }

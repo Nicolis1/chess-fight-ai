@@ -1,0 +1,15 @@
+.pillContainer{
+    width: 100%;
+    height: 30px;
+    border-radius: 10px;
+}
+.pillCenterer{
+    width: 90%;
+    margin: auto;
+    height: inherit;
+    display: flex;
+}
+.wins, .draws, .losses{
+    display: block;
+    height: 100%;
+}

@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 import { BotData } from './api/bots';
-import { Result } from '../components/TestResults/TestResultsTable';
+import { Result } from '../components/ResultsPill/ResultsPill';
 export const STARTER_CODE1 =
 	//comment for code formatting
 	`function getMove(position){

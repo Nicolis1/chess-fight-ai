@@ -8,9 +8,7 @@ import Button from '../../components/Button/Button.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
 import { simulateGames } from '../../data/utils.ts';
-import TestResults, {
-	Result,
-} from '../../components/TestResults/TestResultsTable.tsx';
+import TestResults from '../../components/TestResults/TestResultsTable.tsx';
 import { Tooltip } from 'react-tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
@@ -24,6 +22,7 @@ import {
 	postBotChallenable,
 } from '../../data/api/bots.ts';
 import { fetchActiveUser } from '../../data/api/users.ts';
+import { Result } from '../../components/ResultsPill/ResultsPill.tsx';
 function EditorPage() {
 	const activeCodeData = useSelector(
 		(state: ActiveState) => state.activeCode.value,
@@ -88,6 +87,7 @@ function EditorPage() {
 		setResults(results);
 	};
 	const runCode = () => {
+		console.log(botData?.code);
 		if (botData && botData.code != null) {
 			setCalculating(true);
 
