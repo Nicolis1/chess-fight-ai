@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BotData } from '../../data/api/bots';
 import './BotSelectionModal.css';
-import Button from '../Button/Button.tsx';
 
 export enum ChallengeEvent {
 	Challenge,
@@ -35,68 +34,81 @@ function BotSelectionModal(props: {
 	}
 
 	return (
-		<div className='modalContainer'>
-			<div className='modalTitle'>
-				<h2>{title}</h2>
-				<button
-					className='close'
-					onClick={() => {
-						props.hideModal();
-					}}
-				>
-					<span className='icon-close' />
-				</button>
-			</div>
-			<div className='botsToSelect'>
-				{props.bots.map((bot) => {
-					return (
-						<div
-							key={bot.id}
-							onClick={() => {
-								setSelectedBot(bot);
-							}}
-							className={
-								selectedBot?.id === bot.id
-									? 'botToSelect selected'
-									: 'botToSelect'
-							}
-						>
-							{(bot?.name || '?').substring(0, 40)}
-							{bot?.name.length > 40 ? '...' : ''}
-							<span
+		<div
+			className='blurrer'
+			onClick={(e) => {
+				props.hideModal();
+				e.stopPropagation();
+			}}
+		>
+			<div
+				className='modalContainer'
+				onClick={(e) => {
+					e.stopPropagation();
+				}}
+			>
+				<div className='modalTitle'>
+					<h2>{title}</h2>
+					<button
+						className='close'
+						onClick={() => {
+							props.hideModal();
+						}}
+					>
+						<span className='icon-close' />
+					</button>
+				</div>
+				<div className='botsToSelect'>
+					{props.bots.map((bot) => {
+						return (
+							<div
+								key={bot.id}
 								onClick={(e) => {
-									alert(bot.code);
-									e.stopPropagation();
+									setSelectedBot(bot);
 								}}
+								className={
+									selectedBot?.id === bot.id
+										? 'botToSelect selected'
+										: 'botToSelect'
+								}
 							>
-								View Code <span className='icon-arrow-right' />
-							</span>
-						</div>
-					);
-				})}
-			</div>
-			<div className='footerButtons'>
-				<button
-					onClick={() => {
-						props.hideModal();
-					}}
-					className='cancel'
-				>
-					Cancel
-				</button>
-				<button
-					disabled={!selectedBot}
-					onClick={() => {
-						props.hideModal();
-						props.onSelect(selectedBot);
-					}}
-					className='select'
-				>
-					{`${selectButtonText} ${selectedBot?.name.substring(0, 30) || '?'}${
-						selectedBot?.name.length > 30 ? '...' : ''
-					}`}
-					<span className='icon-arrow-right' />
-				</button>
+								{(bot?.name || '?').substring(0, 40)}
+								{bot?.name.length > 40 ? '...' : ''}
+								<span
+									onClick={(e) => {
+										alert(bot.code);
+										e.stopPropagation();
+									}}
+								>
+									View Code <span className='icon-arrow-right' />
+								</span>
+							</div>
+						);
+					})}
+				</div>
+				<div className='footerButtons'>
+					<button
+						onClick={() => {
+							props.hideModal();
+						}}
+						className='cancel'
+					>
+						Cancel
+					</button>
+					<button
+						disabled={!selectedBot}
+						onClick={() => {
+							props.hideModal();
+							props.onSelect(selectedBot);
+						}}
+						className='select'
+					>
+						{`${selectButtonText} ${selectedBot?.name.substring(0, 30) || '?'}${
+							selectedBot?.name.length > 30 ? '...' : ''
+						}`}
+						<span className='icon-arrow-right' />
+					</button>
+				</div>
 			</div>
 		</div>
 	);

@@ -90,7 +90,6 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             flash('Logged in successfully.')
-            print(session)
             return redirect('/editor')
         else:
             return parse_json({"error":"bad login"})
@@ -170,12 +169,16 @@ def new_bot():
     user_id = current_user.get_id()
     user_data = userCollection.find_one({'userid':  user_id})
     bot_id = uuid4().hex
-    name = "New Bot" + str(len(user_data["bots"]))
+    defaultName = "New Bot" + str(len(user_data["bots"]))
+    if(len(data["name"]) <1):
+        name = defaultName
+    else:
+        name=data["name"]
     if user_data != None:
         botCollection.insert_one({"code":data["code"], "owner":user_id, "name":name,  "botid":bot_id, "challengable":False})
         userCollection.update_one({'userid': user_id}, {'$push':{"bots":bot_id}})
         
-    return parse_json({'message': 'bot added', 'bot_id': str(bot_id), 'code':data["code"], "name":name}), 200
+    return parse_json({'message': 'bot added', 'bot_id': str(bot_id), 'code':data["code"], "name":name, "challengable":False}), 200
 
 @app.route('/bots/all', methods=['GET'])
 @login_required
@@ -275,25 +278,12 @@ def new_tourney():
     data = request.json
     user_id = current_user.get_id()     
     if(user_id != "4f7ed09cccc4409d9404235d76e95bc1"):
-        print(user_id)
         return parse_json({'error':'must login as admin'}), 401
     
     challenge_id = uuid4().hex
     challengesCollection.insert_one({"type":"tournament","name":data["name"], "match_data":[], "participants":[], "scheduled":data['time'],  "challengeid":challenge_id})
     return parse_json({'message': 'tournament scheduled', 'challengeid': str(challenge_id), 'scheduled':data['time']}), 200
 
-@app.route('/challenges/direct/new', methods=['POST'])
-@login_required
-def new_challenge():
-    data = request.json
-    competitors = botCollection.find({"botid": {"$in": data["bots"]}})
-    listcom = list(competitors)
-    #todo add logic to check bots are owned by different people, and both are open to challenges
-    print(listcom)
-    scheduledTime =time.time()
-    challenge_id = uuid4().hex
-    challengesCollection.insert_one({"type":"challenge", "creator":current_user.get_id(), "match_data":[], "participants":listcom, "scheduled":scheduledTime,  "challengeid":challenge_id})
-    return parse_json({'message': 'tournament scheduled', 'challengeid': str(challenge_id), 'scheduled':scheduledTime}), 200
 
 @app.route('/challenges/created', methods=['GET'])
 @login_required
@@ -304,7 +294,6 @@ def get_created_challenges():
 
 @app.route('/challenges/tournaments', methods=['GET'])
 def get_existing_tournaments():
-    botCollection.find({})
     existing_tournaments = challengesCollection.aggregate([
         {
             "$match": { "type": "tournament" } 
@@ -388,10 +377,82 @@ def direct_challenge():
     opponentBot = botCollection.find_one({"botid":data["opponentid"] })
     #todo, verify mybot belongs to current user, opponent bot belongs to someone else, both are available for challenge
     output = simulate_challenge.run_docker_container( mybot["code"], opponentBot["code"], mybot['botid'],opponentBot["botid"],)
-    print(output)
+    scheduledTime =time.time()
+    challenge_id = uuid4().hex
+    challengesCollection.insert_one({"type":"challenge", "creator":current_user.get_id(), "match_data":output, "participants":[mybot["botid"],opponentBot["botid"]], "scheduled":scheduledTime,  "challengeid":challenge_id})
+    
     #returns result:{output:{}}, maybe simplify?
     response = parse_json({"result":output.decode('utf-8')})
     return response, 200
+
+
+@app.route('/challenges/direct', methods=['GET'])
+@login_required
+def get_challenges_current_user():
+    user_id = current_user.get_id()
+    recent_challenges = challengesCollection.aggregate([
+        {
+            "$match": { "type": "challenge" } 
+        },
+        {
+            "$lookup": {
+            "from": "bots", 
+            "localField": "participants", 
+            "foreignField": "botid",
+            "as": "participantsData" 
+            }
+        },
+        { 
+            "$unwind": {
+            "path": "$participantsData",
+            "preserveNullAndEmptyArrays": True
+            }
+        }, 
+        {
+            "$match": {
+            "participantsData.owner": user_id
+            }
+        },
+        {
+            "$lookup": {
+            "from": "users", 
+            "localField": "participantsData.owner", 
+            "foreignField": "userid",
+            "as": "userData" 
+            }
+        },
+        {
+            "$addFields": {
+                "participantData":{
+                    "$cond": {
+                    "if": { "$eq": [{ "$size": "$userData" }, 0] },
+                    "then": "$$REMOVE",
+                    "else": {
+                        "username":{"$first":"$userData.username"},
+                                    "botName":"$participantsData.name",
+                                    "code":"$participantsData.code",
+                                    "botid":"$participantsData.botid",
+                                    "challengable":"$participantsData.challengable"} ,
+                    }
+                }
+            }
+        },
+        {
+            "$group":{
+                "_id": "$_id",
+                "participantData":{"$push":"$participantData"},
+               "type":{"$first":"$type"},
+               "challengeid":{"$first":"$challengeid"},
+               "scheduled":{"$first":"$scheduled"},
+               "match_data":{"$first":"$match_data"},
+               "name":{"$first":"$name"},
+            }
+        },
+        { "$sort" : { "scheduled" : -1 } }
+    ])
+
+    #todo add logic to return only upcoming and recently finished challenges
+    return parse_json({'challenges':recent_challenges}), 200
 
 
 def parse_json(data):

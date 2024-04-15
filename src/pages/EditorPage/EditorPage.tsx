@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './EditorPage.css';
 import SideNav from '../../components/SideNav/SideNav.tsx';
 
@@ -82,12 +82,7 @@ function EditorPage() {
 		if (botData?.id) setBotData({ ...botData, code });
 	};
 
-	const finishSimulation = (results) => {
-		setCalculating(false);
-		setResults(results);
-	};
 	const runCode = () => {
-		console.log(botData?.code);
 		if (botData && botData.code != null) {
 			setCalculating(true);
 
@@ -142,6 +137,14 @@ function EditorPage() {
 			});
 		}
 	};
+	const duplicateBot = useCallback(() => {
+		newBot(botData?.code, botData?.name + ' copy').then((bot) => {
+			if (bot) {
+				dispatch(setActiveCodeData(bot));
+				setBotData(bot);
+			}
+		});
+	}, [botData, dispatch]);
 
 	const playMoves = (moves) => {
 		const movesClone = [...moves];
@@ -164,14 +167,9 @@ function EditorPage() {
 			setIntervalID(id);
 		}, 500);
 	};
-
 	return (
 		<div className='container'>
-			<Tooltip id='editor-button-edit-name' />
-			<Tooltip id='editor-button-run' />
-			<Tooltip id='editor-button-submit' />
-			<Tooltip id='editor-button-challengable' />
-
+			<Tooltip id='editor-button' />
 			<SideNav />
 			<div className='editorSection'>
 				<div
@@ -208,7 +206,7 @@ function EditorPage() {
 							{hoveringTitle && (
 								<span
 									data-tooltip-content={'Edit name'}
-									data-tooltip-id={'editor-button-edit-name'}
+									data-tooltip-id={'editor-button'}
 									className='icon-pencil'
 								/>
 							)}
@@ -220,24 +218,30 @@ function EditorPage() {
 						<Button
 							icon='icon-control-play'
 							onClick={runCode}
-							tooltipID={'editor-button-run'}
+							tooltipId={'editor-button'}
 							tooltipContent={'Run'}
 						/>
 						<Button
 							icon='icon-rocket'
 							onClick={submitChanges}
-							tooltipID={'editor-button-submit'}
+							tooltipId={'editor-button'}
 							tooltipContent={'Submit'}
 						/>
 						<Button
 							icon={botData?.challengable ? 'icon-support' : 'icon-target'}
 							onClick={toggleChallengeable}
-							tooltipID={'editor-button-challengable'}
+							tooltipId={'editor-button'}
 							tooltipContent={
 								botData?.challengable
 									? 'Make bot private'
 									: 'Allow others to challenge your bot'
 							}
+						/>
+						<Button
+							icon={'icon-layers'}
+							onClick={duplicateBot}
+							tooltipId={'editor-button'}
+							tooltipContent={'Duplicate Bot'}
 						/>
 					</div>
 				</div>

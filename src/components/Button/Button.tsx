@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { MouseEventHandler, ReactElement, ReactNode } from 'react';
 import './Button.css';
 
-export default function Button(props) {
+export default function Button(props: {
+	onClick: MouseEventHandler<HTMLDivElement>;
+	onRightClick?: Function;
+	children?: ReactNode | ReactElement;
+	tooltipContent?: string;
+	tooltipId?: string;
+	icon?: string;
+}) {
 	return (
-		<div className='custom-button' onClick={props.onClick}>
+		<div
+			className='custom-button'
+			onClick={props.onClick}
+			onContextMenu={(e) => {
+				if (!!props.onRightClick) {
+					props.onRightClick();
+					e.preventDefault();
+				}
+			}}
+		>
 			{props.children && <div className='children'>{props.children}</div>}
 			<span
 				data-tooltip-content={props.tooltipContent}
-				data-tooltip-id={props.tooltipID}
+				data-tooltip-id={props.tooltipId}
 			>
 				<i className={props.icon} />
 			</span>

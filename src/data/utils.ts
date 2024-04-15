@@ -43,6 +43,7 @@ type Game = {
 	playerColor: string;
 	board: Chess;
 };
+
 export async function simulateGames(
 	botData: BotData | null,
 	opponentData: BotData | null,

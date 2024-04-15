@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	Tournament,
 	challengeBot,
+	fetchChallenges,
 	fetchTournaments,
 	joinTournament,
 } from '../../data/api/challenges.ts';
@@ -25,8 +26,6 @@ import { Result } from '../../components/ResultsPill/ResultsPill.tsx';
 function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 	const [displayModal, setDisplayModal] = useState(false);
 	const [participants, setParticipants] = useState(props.participants);
-	console.log('cid ', props.challengeId);
-	console.log('participants ', props.participants);
 	return (
 		<div key={props.challengeId} className='tournament'>
 			<div>
@@ -99,7 +98,7 @@ function ChallengeElement(props: {
 					setDisplayModal(true);
 				}}
 				icon='icon-target'
-				tooltipID='challenge-bot-button'
+				tooltipId='challenge-bot-button'
 				tooltipContent="Select a bot you've created to challenge this one"
 			>
 				Challenge
@@ -148,6 +147,11 @@ function CompetePage() {
 			fetchBots().then((bots) => {
 				if (bots.length > 0) {
 					setMyBots(bots);
+				}
+			});
+			fetchChallenges().then((challenges) => {
+				if (!!challenges) {
+					console.log(challenges);
 				}
 			});
 		})();
@@ -217,10 +221,36 @@ function CompetePage() {
 			<h1>Upcoming Tournaments!</h1>
 			<div className='tournamentWrapper'>{tournamentComponents}</div>
 			<hr />
-			<h1>Challenge these bots directly</h1>
-			<Tooltip id='challenge-bot-button' />
-			<div className='challengeWrapper'>{botComponents}</div>
 
+			<h1>Challenges</h1>
+			<div className='challengeWrapper'>
+				<div>
+					<h3>Challenge these bots</h3>
+					<Tooltip id='challenge-bot-button' />
+					<div className='challenges'>{botComponents}</div>
+				</div>
+				<div>
+					<h3>All Challenges</h3>
+					{
+						<ul>
+							<li />
+							<li />
+							<li />
+							<li />
+						</ul>
+					}
+				</div>
+				<div>
+					<h3>Your Challenges</h3>
+					<ul>
+						<li />
+						<li />
+						<li />
+						<li />
+						<li />
+					</ul>
+				</div>
+			</div>
 			<div className='gameVisualization'>
 				{<Board position={displayFen}></Board>}
 			</div>

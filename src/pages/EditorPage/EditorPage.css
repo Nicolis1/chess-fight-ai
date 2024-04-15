@@ -78,3 +78,6 @@
 .titleBar .editorButtons *{
     font-size: 24px;
 }
+#opponentBotTitle{
+    text-wrap: nowrap;
+}

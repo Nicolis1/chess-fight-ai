@@ -70,10 +70,41 @@ export async function joinTournament(botId: string, tournamentId: string) {
 			},
 			body: JSON.stringify({ botid: botId, tournament: tournamentId }),
 		});
-		console.log(resp);
 		const result = JSON.parse(await resp.json());
-		console.log(result);
 		return result;
+	} catch (error) {
+		console.error(error);
+		return [];
+	}
+}
+
+export async function fetchChallenges(): Promise<Tournament[]> {
+	try {
+		const resp = await fetch('/challenges/direct', {
+			method: 'GET',
+		});
+		console.log(resp);
+		const challengesForReturn: Tournament[] = [];
+		for (let tournament of JSON.parse(await resp.json())?.challenges) {
+			console.log(tournament);
+			challengesForReturn.push({
+				challengeId: tournament.challengeid,
+				matchData: tournament.match_data,
+				participants: tournament.participantData.map((pData): BotData => {
+					return {
+						name: pData.botName,
+						id: pData.botid,
+						challengable: pData.challengable,
+						code: pData.code,
+						ownerName: pData.username,
+					};
+				}),
+				scheduled: tournament.scheduled,
+				type: tournament.type,
+				name: tournament.name,
+			});
+		}
+		return challengesForReturn;
 	} catch (error) {
 		console.error(error);
 		return [];

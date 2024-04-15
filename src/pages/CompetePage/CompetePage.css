@@ -32,7 +32,7 @@
     font-size: 1.5em;
     font-weight: 600;
 }
-.challengeWrapper{
+.challengeWrapper .challenges{
     width: 500px;
     display: flex;
     flex-direction: column;
@@ -42,4 +42,10 @@
     height:30px;
     justify-content: space-between;
     border: 1px solid black;
+}
+.challengeWrapper{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
 }

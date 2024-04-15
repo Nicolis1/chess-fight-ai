@@ -31,17 +31,13 @@ export default function BotSelections(props) {
 				return (
 					<Button
 						key={bot.id}
-						onClick={() => {
-							if (bot.id !== activeCode?.id)
-								dispatch(
-									setActiveCodeData({
-										id: bot.id,
-										code: bot.code,
-										name: bot.name,
-									}),
-								);
+						onClick={(e) => {
+							if (bot.id !== activeCode?.id) dispatch(setActiveCodeData(bot));
 						}}
 						icon='icon-pencil'
+						onRightClick={() => {
+							console.log('right clicked');
+						}}
 					>
 						{bot.name}
 					</Button>

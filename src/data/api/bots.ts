@@ -52,14 +52,17 @@ export async function fetchChallengable(): Promise<BotData[]> {
 	}
 }
 
-export async function newBot(): Promise<BotData | null> {
+export async function newBot(
+	code = 'return position.moves()[0]',
+	name = '',
+): Promise<BotData | null> {
 	try {
 		const resp = await fetch('/bots/new', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ code: 'return position.moves()[0]' }),
+			body: JSON.stringify({ code, name }),
 		});
 
 		const response = JSON.parse(await resp.json());
@@ -72,6 +75,7 @@ export async function newBot(): Promise<BotData | null> {
 			id: response.bot_id,
 			name: response.name,
 			code: response.code,
+			challengable: response.challengable,
 		};
 	} catch (error) {
 		console.error(error);
