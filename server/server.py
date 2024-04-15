@@ -402,17 +402,18 @@ def get_challenges_current_user():
             "as": "participantsData" 
             }
         },
+        {
+            "$match": {
+            "participantsData.owner": user_id
+            }
+        },
         { 
             "$unwind": {
             "path": "$participantsData",
             "preserveNullAndEmptyArrays": True
             }
         }, 
-        {
-            "$match": {
-            "participantsData.owner": user_id
-            }
-        },
+
         {
             "$lookup": {
             "from": "users", 

@@ -111,16 +111,11 @@ function CompetePage() {
 	const activeUser = useSelector(
 		(state: ActiveState) => state.activeUser.value,
 	);
-	const [tournaments, setTournaments] = useState<Tournament[] | null>(null);
-	const [challengableBots, setChallengableBots] = useState<BotData[] | null>(
-		null,
-	);
-	const [myBots, setMyBots] = useState<BotData[] | null>(null);
+	const [tournaments, setTournaments] = useState<Tournament[]>([]);
+	const [challengableBots, setChallengableBots] = useState<BotData[]>([]);
+	const [myBots, setMyBots] = useState<BotData[]>([]);
 	const [botIdForChallenge, setBotIdForChallenge] = useState<string>('');
-	const [results, setResults] = useState<Result[] | null>(null);
-	const [displayFen, setDisplayFen] = useState(new Chess().fen());
-	const [intervalID, setIntervalID] = useState<NodeJS.Timeout | null>(null);
-
+	const [recentChallenges, setRecentChallenges] = useState<Tournament[]>([]);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -151,24 +146,38 @@ function CompetePage() {
 			});
 			fetchChallenges().then((challenges) => {
 				if (!!challenges) {
+					setRecentChallenges(challenges);
 					console.log(challenges);
 				}
 			});
 		})();
 	}, [dispatch]);
 
-	const tournamentComponents = (tournaments || []).map(
+	const tournamentComponents = tournaments.map(
 		(tournament: Tournament, index) => {
 			return (
 				<TournamentElement
 					key={tournament.challengeId}
-					eligibleBots={myBots || []}
+					eligibleBots={myBots}
 					{...tournament}
 				/>
 			);
 		},
 	);
-	const botComponents = (challengableBots || []).map((bot) => {
+	const recentChallengeComponents = recentChallenges.map((challenge) => {
+		return (
+			<>
+				{challenge.participants.map((p) => (
+					<>
+						{p.name}
+						{p.ownerName}
+					</>
+				))}
+				{new Date(challenge.scheduled * 1000).toDateString()}
+			</>
+		);
+	});
+	const botComponents = challengableBots.map((bot) => {
 		if (!bot.name || !bot.ownerName || !bot.code) {
 			return null;
 		}
@@ -181,11 +190,10 @@ function CompetePage() {
 				id={bot.id}
 				owner={bot.ownerName}
 				code={bot.code}
-				eligibleBots={myBots || []}
+				eligibleBots={myBots}
 				onChallenge={(botForChallenge) => {
 					if (botForChallenge?.id && bot?.id) {
 						challengeBot(botForChallenge.id, bot.id).then((resp) => {
-							setResults(resp);
 							setBotIdForChallenge(botForChallenge.id);
 						});
 					}
@@ -193,28 +201,6 @@ function CompetePage() {
 			/>
 		);
 	});
-
-	const playMoves = (moves) => {
-		const movesClone = [...moves];
-		if (intervalID != null) {
-			clearInterval(intervalID);
-		}
-		let game = new Chess();
-		// quick delay before starting to readjust focus visually
-		setDisplayFen(game.fen());
-
-		setTimeout(() => {
-			const id = setInterval(() => {
-				if (movesClone.length > 0) {
-					game.move(movesClone.shift());
-				} else {
-					clearInterval(id);
-				}
-				setDisplayFen(game.fen());
-			}, 150);
-			setIntervalID(id);
-		}, 500);
-	};
 
 	return (
 		<div className='challengePage'>
@@ -231,14 +217,7 @@ function CompetePage() {
 				</div>
 				<div>
 					<h3>All Challenges</h3>
-					{
-						<ul>
-							<li />
-							<li />
-							<li />
-							<li />
-						</ul>
-					}
+					{recentChallengeComponents}
 				</div>
 				<div>
 					<h3>Your Challenges</h3>
@@ -251,16 +230,6 @@ function CompetePage() {
 					</ul>
 				</div>
 			</div>
-			<div className='gameVisualization'>
-				{<Board position={displayFen}></Board>}
-			</div>
-			{results && !!botIdForChallenge && (
-				<TestResults
-					results={results}
-					playMoves={playMoves}
-					playerId={botIdForChallenge}
-				/>
-			)}
 		</div>
 	);
 }
