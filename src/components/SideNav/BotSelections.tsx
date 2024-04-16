@@ -42,7 +42,7 @@ export default function BotSelections(props) {
 							e.preventDefault();
 						}}
 					>
-						{bot.name}
+						<div className='text'>{bot.name}</div>
 						<FontAwesomeIcon icon={faPencil} />
 					</button>
 				);

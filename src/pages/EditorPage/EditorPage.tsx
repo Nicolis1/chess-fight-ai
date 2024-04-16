@@ -4,7 +4,6 @@ import SideNav from '../../components/SideNav/SideNav.tsx';
 
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import Button from '../../components/Button/Button.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
 import { simulateGames } from '../../data/utils.ts';
@@ -13,7 +12,7 @@ import { Tooltip } from 'react-tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { setActiveCodeData } from '../../data/features/activeCodeSlice.ts';
-import type { ActiveState } from '../../data/stores/dataStore.ts';
+import { ActiveState } from '../../data/stores/dataStore.ts';
 import { setActiveUser } from '../../data/features/activeUserSlice.ts';
 import {
 	BotData,
@@ -31,6 +30,10 @@ import {
 	faPeace,
 	faPlay,
 } from '@fortawesome/free-solid-svg-icons';
+import BotSelectionModal, {
+	ChallengeEvent,
+} from '../../components/BotSelectionModal/BotSelectionModal.tsx';
+
 function EditorPage() {
 	const activeCodeData = useSelector(
 		(state: ActiveState) => state.activeCode.value,
@@ -48,6 +51,8 @@ function EditorPage() {
 		useState<BotData | null>(null);
 	const [editingTitle, setEditingTitle] = useState(false);
 	const [hoveringTitle, setHoveringTitle] = useState(false);
+	const [displaySelectionModal, setDisplaySelectionModal] =
+		useState<boolean>(false);
 	const [allBots, setAllBots] = useState<BotData[]>([]);
 	const dispatch = useDispatch();
 
@@ -93,7 +98,6 @@ function EditorPage() {
 	const runCode = () => {
 		if (botData && botData.code != null) {
 			setCalculating(true);
-
 			simulateGames(activeCodeData, selectedTestOpponentData)
 				.then((response) => {
 					setResults(response);
@@ -127,6 +131,17 @@ function EditorPage() {
 			alert('Nothing to save');
 		}
 	};
+	const displayBotSelectionModalCallback = useCallback(() => {
+		setDisplaySelectionModal(true);
+		const editor = document.getElementById('editorWrapper');
+		if (editor) editor.style.display = 'none';
+	}, []);
+
+	const hideBotSelectionModalCallback = useCallback(() => {
+		setDisplaySelectionModal(false);
+		const editor = document.getElementById('editorWrapper');
+		if (editor) editor.style.display = 'block';
+	}, []);
 
 	const toggleChallengeable = () => {
 		let updatedState = botData?.challengable !== true;
@@ -180,6 +195,18 @@ function EditorPage() {
 			<Tooltip id='editor-button' />
 			<SideNav />
 			<div className='editorSection'>
+				<BotSelectionModal
+					onSelect={(selectedBotData) => {
+						if (selectedBotData) {
+							setSelectedTestOpponentData(selectedBotData);
+							runCode();
+						}
+					}}
+					bots={allBots}
+					displayModal={displaySelectionModal}
+					hideModal={hideBotSelectionModalCallback}
+					forEvent={ChallengeEvent.Challenge}
+				></BotSelectionModal>
 				<div
 					className='titleBar'
 					onMouseEnter={() => {
@@ -225,7 +252,7 @@ function EditorPage() {
 					<div className='editorButtons'>
 						<button
 							className='custom-button'
-							onClick={runCode}
+							onClick={displayBotSelectionModalCallback}
 							data-tooltip-id={'editor-button'}
 							data-tooltip-content={'Run'}
 						>
@@ -263,7 +290,7 @@ function EditorPage() {
 						</button>
 					</div>
 				</div>
-				<div className='editorWrapper'>
+				<div id='editorWrapper'>
 					<CodeMirror
 						value={botData?.code}
 						extensions={[javascript({ jsx: false })]}
@@ -278,27 +305,9 @@ function EditorPage() {
 				</div>
 				<div className='testOutput'>
 					<div className='title'>
-						<h1 id='opponentBotTitle'>Test Vs.</h1>
-						<select
-							name='opponentBot'
-							aria-labelledby='opponentBotTitle'
-							value={selectedTestOpponentData?.id}
-							onChange={(e) => {
-								const selectedBotData = allBots.find(
-									(botData) => botData.id === e.target.value,
-								);
-
-								setSelectedTestOpponentData(selectedBotData || allBots[0]);
-							}}
-						>
-							{allBots.map((botData) => {
-								return (
-									<option key={botData.id} value={botData.id}>
-										{botData.name}
-									</option>
-								);
-							})}
-						</select>
+						<h1 id='opponentBotTitle'>
+							Test Vs. {selectedTestOpponentData?.name}
+						</h1>
 					</div>
 					{calculating && 'calculating'}
 					{results != null && activeCodeData && (

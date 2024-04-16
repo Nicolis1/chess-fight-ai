@@ -6,10 +6,10 @@ Known bugs:
 - lots of challengers breaks scrolling on compete page
 - view code in bot selection modal should have special hover behavior
 - the way I have use effects set up to fetch data causes several rerenders, with several extra api calls
+- security issues form packages
 
 - todo
-  - better style bot selection moda
-  - use bot selection modal on editor page
+  - better style bot selection modal
   - finish challengers ui
   - do your recent matched ui
     - this needs to include a better way to visualize all game results

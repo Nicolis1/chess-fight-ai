@@ -11,7 +11,7 @@
     border-right:1px solid black;
 }
 .debugger{
-    width:fit-content;
+    width:300px;
     height:100%;
     display: flex;
     flex-direction: column;
@@ -24,7 +24,7 @@
 }
 .testOutput{
    flex-grow: 100;
-   overflow: scroll;
+   overflow: auto;
 }
 .testOutput .title {
     display: flex;
@@ -36,6 +36,7 @@
     border: none;
     border-bottom: 1px solid black;
     height:50px;
+    width: 200px;
     max-width: 200px;
 }
 .titleBar{
@@ -78,8 +79,17 @@
 .titleBar .editorButtons *{
     font-size: 24px;
 }
+.testOutput .title{
+    width: 100%;
+}
 #opponentBotTitle{
     text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    margin:8px;
+    text-align: center;
+    font-size: 1em;
 }
 .editorButtons button{
     background: none;

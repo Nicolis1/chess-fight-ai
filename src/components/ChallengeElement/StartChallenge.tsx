@@ -47,7 +47,12 @@ function StartChallenge(props: {
 					................................................................................................................................................................
 				</div>
 				<div className='author'>{props.owner}</div>
-				<button className='joinChallenge'>
+				<button
+					className='joinChallenge'
+					onClick={() => {
+						setDisplayModal(true);
+					}}
+				>
 					Challenge <FontAwesomeIcon icon={faKhanda} />
 				</button>
 			</div>
