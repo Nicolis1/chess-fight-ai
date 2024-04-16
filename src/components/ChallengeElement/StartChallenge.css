@@ -1,0 +1,51 @@
+.challenge{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-wrap: nowrap;
+    width: 100%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.challenge:nth-child(even){
+    background-color: #DfDfDf;
+}
+.dots {
+    text-wrap: nowrap;
+    overflow: hidden;
+}
+
+.challenger{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    justify-content: center;
+    align-items: center;
+}
+.botName button{
+    background-color: inherit;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0px;
+    text-decoration: underline;
+}
+.botName button:hover{
+    color:#008CD1
+}
+.joinChallenge{
+    font-size: 1em;
+    cursor: pointer;
+    background-image: linear-gradient(to bottom, hsl(37, 7%, 22%), hsl(37, 5%, 19%) 100%);
+    box-shadow: 0px 2px 4px rgba(255,255,255, 0.2) inset;
+    color: #DfDfDf;
+    padding: 4px;
+    margin: 4px;
+}
+.joinChallenge:hover{
+    box-shadow: 2px 2px 4px rgba(255,255,255, 0.5) inset;
+}

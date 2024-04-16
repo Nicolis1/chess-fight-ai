@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux';
 import React from 'react';
 import { ActiveState } from '../../data/stores/dataStore.ts';
 import { BotData, fetchBots } from '../../data/api/bots.ts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencil } from '@fortawesome/free-solid-svg-icons';
 
 export default function BotSelections(props) {
 	const dispatch = useDispatch();
@@ -29,18 +31,20 @@ export default function BotSelections(props) {
 			<h1>Bots</h1>
 			{myBots.map((bot) => {
 				return (
-					<Button
+					<button
 						key={bot.id}
+						className='custom-button'
 						onClick={(e) => {
 							if (bot.id !== activeCode?.id) dispatch(setActiveCodeData(bot));
 						}}
-						icon='icon-pencil'
-						onRightClick={() => {
+						onContextMenu={(e) => {
 							console.log('right clicked');
+							e.preventDefault();
 						}}
 					>
 						{bot.name}
-					</Button>
+						<FontAwesomeIcon icon={faPencil} />
+					</button>
 				);
 			})}
 		</>

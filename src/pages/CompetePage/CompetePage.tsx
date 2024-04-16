@@ -8,104 +8,13 @@ import {
 	challengeBot,
 	fetchChallenges,
 	fetchTournaments,
-	joinTournament,
 } from '../../data/api/challenges.ts';
 import { BotData, fetchBots, fetchChallengable } from '../../data/api/bots.ts';
 import { fetchActiveUser } from '../../data/api/users.ts';
 import './CompetePage.css';
-import Button from '../../components/Button/Button.tsx';
 import { Tooltip } from 'react-tooltip';
-import TestResults from '../../components/TestResults/TestResultsTable.tsx';
-import Board from '../../components/board/Board.tsx';
-import { Chess } from 'chess.js';
-import BotSelectionModal, {
-	ChallengeEvent,
-} from '../../components/BotSelectionModal/BotSelectionModal.tsx';
-import { Result } from '../../components/ResultsPill/ResultsPill.tsx';
-
-function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
-	const [displayModal, setDisplayModal] = useState(false);
-	const [participants, setParticipants] = useState(props.participants);
-	return (
-		<div key={props.challengeId} className='tournament'>
-			<div>
-				<BotSelectionModal
-					forEvent={ChallengeEvent.Tournament}
-					displayModal={displayModal}
-					bots={props.eligibleBots}
-					onSelect={(selectedBot) => {
-						setParticipants([selectedBot, ...participants]);
-						joinTournament(selectedBot.id, props.challengeId);
-					}}
-					hideModal={() => {
-						setDisplayModal(false);
-					}}
-				/>
-				<div className='title'>{props.name}</div>
-
-				<div>{new Date(props.scheduled * 1000).toDateString()}</div>
-				<div>{participants.length} participants so far</div>
-				<div>
-					{participants.slice(0, 3).map((participant) => {
-						return (
-							<div className='participant'>
-								{participant.name} by {participant.ownerName}
-							</div>
-						);
-					})}
-					{participants.length > 3 && '...'}
-				</div>
-			</div>
-			<Button
-				icon='icon-arrow-right'
-				onClick={() => {
-					setDisplayModal(true);
-				}}
-			>
-				Join
-			</Button>
-		</div>
-	);
-}
-function ChallengeElement(props: {
-	id?: string;
-	name?: string;
-	owner?: string;
-	code?: string;
-	onChallenge: Function;
-	eligibleBots: BotData[];
-}) {
-	const [displayModal, setDisplayModal] = useState(false);
-
-	return (
-		<div key={props.id} className='challenge'>
-			<BotSelectionModal
-				forEvent={ChallengeEvent.Challenge}
-				displayModal={displayModal}
-				bots={props.eligibleBots}
-				onSelect={(selectedBot) => {
-					props.onChallenge(selectedBot);
-				}}
-				hideModal={() => {
-					setDisplayModal(false);
-				}}
-			/>
-			<span>
-				{props.name} by {props.owner}
-			</span>
-			<Button
-				onClick={() => {
-					setDisplayModal(true);
-				}}
-				icon='icon-target'
-				tooltipId='challenge-bot-button'
-				tooltipContent="Select a bot you've created to challenge this one"
-			>
-				Challenge
-			</Button>
-		</div>
-	);
-}
+import TournamentElement from '../../components/TournamentElement/TournamentElement.tsx';
+import StartChallenge from '../../components/ChallengeElement/StartChallenge.tsx';
 
 function CompetePage() {
 	const activeUser = useSelector(
@@ -114,7 +23,6 @@ function CompetePage() {
 	const [tournaments, setTournaments] = useState<Tournament[]>([]);
 	const [challengableBots, setChallengableBots] = useState<BotData[]>([]);
 	const [myBots, setMyBots] = useState<BotData[]>([]);
-	const [botIdForChallenge, setBotIdForChallenge] = useState<string>('');
 	const [recentChallenges, setRecentChallenges] = useState<Tournament[]>([]);
 	const dispatch = useDispatch();
 
@@ -173,6 +81,7 @@ function CompetePage() {
 						{p.ownerName}
 					</>
 				))}
+				<br />
 				{new Date(challenge.scheduled * 1000).toDateString()}
 			</>
 		);
@@ -182,7 +91,7 @@ function CompetePage() {
 			return null;
 		}
 		return (
-			<ChallengeElement
+			<StartChallenge
 				key={bot.id}
 				name={`${bot.name?.substring(0, 15)}${
 					bot.name?.length > 15 ? '...' : ''
@@ -194,7 +103,7 @@ function CompetePage() {
 				onChallenge={(botForChallenge) => {
 					if (botForChallenge?.id && bot?.id) {
 						challengeBot(botForChallenge.id, bot.id).then((resp) => {
-							setBotIdForChallenge(botForChallenge.id);
+							console.log('challenge completed: ', resp);
 						});
 					}
 				}}
@@ -209,18 +118,20 @@ function CompetePage() {
 			<hr />
 
 			<h1>Challenges</h1>
-			<div className='challengeWrapper'>
-				<div>
-					<h3>Challenge these bots</h3>
-					<Tooltip id='challenge-bot-button' />
-					<div className='challenges'>{botComponents}</div>
-				</div>
-				<div>
-					<h3>All Challenges</h3>
-					{recentChallengeComponents}
+			<div className='challengeSection'>
+				<div className='startChallenge'>
+					<div className='sectionTitle'>Test Your Mettle</div>
+					<div className='challengeWrapper'>
+						<Tooltip id='challenge-bot-button' />
+						<div className='challenges'>{botComponents}</div>
+					</div>
 				</div>
 				<div>
 					<h3>Your Challenges</h3>
+					{recentChallengeComponents}
+				</div>
+				<div>
+					<h3>All Challenges</h3>
 					<ul>
 						<li />
 						<li />

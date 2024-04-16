@@ -6,7 +6,7 @@
     text-decoration: underline;
 }
 .topNav{
-    background-color: #2f2f2f;
+    background-color: #262522;
     height: 45px;
     width: 100%;
     box-sizing: border-box;
@@ -29,12 +29,22 @@
     font-size: 20px;
 }
 .userIndicator{
-    color:white;
     padding-right: 10px;
-    float: left
+    float: left;
+    font-size: large;
 }
 .rightContent{
-    color: white;
+    color:#EFEEEA;
     width: fit-content;
     padding-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.rightContent button{
+    color:#EFEEEA;
+    background:none;
+}
+.rightContent button:hover{
+    font-size: 1.5em;
 }

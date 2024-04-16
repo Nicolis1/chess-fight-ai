@@ -1,0 +1,76 @@
+.tournament{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border:1px solid black;
+    border-radius: 15px;
+    margin:8px;
+    padding:8px;
+    min-width: 340px;
+    width: 400px;                                                                                                                                           
+    color:#262522;
+    background-image: linear-gradient(to bottom right, #FFFFFF, #DfDfDf);
+}
+
+.tournament .participant{
+    display: flex;
+    align-items: center;
+    text-wrap: nowrap;
+}
+.participantsWrapper{                                                                           
+    display: flex;
+    flex-direction: column;
+}
+.participantsWrapper button{
+    background-color: inherit;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0px;
+    text-decoration: underline;
+}
+.participantsWrapper button:hover{
+    color:#008CD1
+}
+.tournament .title{
+    font-size: 1.5em;
+    font-weight: 600;
+    text-wrap: nowrap;
+}
+.tournament .subtitle{
+    display: flex;
+    justify-content: space-between;
+    opacity: .7;
+}
+.dots {
+    text-wrap: nowrap;
+    overflow: hidden;
+}
+.tournament .join{
+    font-size: 1.2em;
+    padding:8px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    width:80%;
+    margin:auto;
+    margin-bottom: 0px;
+    margin-top:8px;
+    box-shadow: 0 2px 4px rgba(255,255,255, 0.2) inset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient(to bottom, hsl(37, 7%, 22%), hsl(37, 5%, 19%) 100%);
+    color: #DfDfDf;
+}
+.tournament .join:hover{
+    box-shadow: 2px 2px 4px rgba(255,255,255, 0.5) inset;
+}
+.tournament .firstToJoin{
+    font-size: 1.5em;
+    width:100%;
+    text-align: center;
+    height: fit-content;
+    margin-top: 24px;
+}

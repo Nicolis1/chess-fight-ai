@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import './SideNav.css';
-import Button from '../Button/Button.tsx';
 import SignoutButton from '../Button/SignoutButton.tsx';
 import NewBot from '../Button/NewBot.tsx';
 
@@ -36,12 +35,11 @@ export default function SideNav(props) {
 						</div>
 					</div>
 				)}
-				<div className='toggleButton'>
-					<Button
-						icon={collapsed ? 'icon-arrow-right' : 'icon-arrow-left'}
-						onClick={toggleCollapse}
-					></Button>
-				</div>
+				<button onClick={toggleCollapse} className='toggleButton'>
+					<span
+						className={collapsed ? 'icon-arrow-right' : 'icon-arrow-left'}
+					/>
+				</button>
 			</div>
 		</div>
 	);

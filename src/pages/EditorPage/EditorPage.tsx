@@ -23,6 +23,14 @@ import {
 } from '../../data/api/bots.ts';
 import { fetchActiveUser } from '../../data/api/users.ts';
 import { Result } from '../../components/ResultsPill/ResultsPill.tsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+	faCopy,
+	faFloppyDisk,
+	faKhanda,
+	faPeace,
+	faPlay,
+} from '@fortawesome/free-solid-svg-icons';
 function EditorPage() {
 	const activeCodeData = useSelector(
 		(state: ActiveState) => state.activeCode.value,
@@ -215,34 +223,44 @@ function EditorPage() {
 					)}
 
 					<div className='editorButtons'>
-						<Button
-							icon='icon-control-play'
+						<button
+							className='custom-button'
 							onClick={runCode}
-							tooltipId={'editor-button'}
-							tooltipContent={'Run'}
-						/>
-						<Button
-							icon='icon-rocket'
+							data-tooltip-id={'editor-button'}
+							data-tooltip-content={'Run'}
+						>
+							<FontAwesomeIcon icon={faPlay} />
+						</button>
+						<button
+							className='custom-button'
 							onClick={submitChanges}
-							tooltipId={'editor-button'}
-							tooltipContent={'Submit'}
-						/>
-						<Button
-							icon={botData?.challengable ? 'icon-support' : 'icon-target'}
+							data-tooltip-id={'editor-button'}
+							data-tooltip-content={'Save'}
+						>
+							<FontAwesomeIcon icon={faFloppyDisk} />
+						</button>
+						<button
+							className='custom-button'
 							onClick={toggleChallengeable}
-							tooltipId={'editor-button'}
-							tooltipContent={
+							data-tooltip-id={'editor-button'}
+							data-tooltip-content={
 								botData?.challengable
-									? 'Make bot private'
-									: 'Allow others to challenge your bot'
+									? 'Others can challenge your bot'
+									: 'Your bot is private'
 							}
-						/>
-						<Button
-							icon={'icon-layers'}
+						>
+							<FontAwesomeIcon
+								icon={botData?.challengable ? faKhanda : faPeace}
+							/>
+						</button>
+						<button
+							className='custom-button'
 							onClick={duplicateBot}
-							tooltipId={'editor-button'}
-							tooltipContent={'Duplicate Bot'}
-						/>
+							data-tooltip-id={'editor-button'}
+							data-tooltip-content={'Duplicate Bot'}
+						>
+							<FontAwesomeIcon icon={faCopy} />
+						</button>
 					</div>
 				</div>
 				<div className='editorWrapper'>

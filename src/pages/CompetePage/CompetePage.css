@@ -1,51 +1,36 @@
 .challengePage{
     height: 100%;
-    background-color: #EFEEEA;
-
+    background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);
 }
 .tournamentWrapper{
     display: flex;
     justify-content: space-evenly;
     overflow: auto;
     overflow-y: hidden;
+    background: none;
 }
-
-.tournament{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border:1px solid black;
-    border-radius: 15px;
-    margin:8px;
-    padding:8px;
-    min-width:250px;
-    max-width: 250px;
-
-}
-.tournament .participant{
-    width:80%;
-    overflow: hidden;
-    text-wrap: nowrap;
-    text-overflow: ellipsis;
-}
-.tournament .title{
-    font-size: 1.5em;
-    font-weight: 600;
-}
-.challengeWrapper .challenges{
-    width: 500px;
-    display: flex;
-    flex-direction: column;
-}
-.challenge{
-    display: flex;
-    height:30px;
-    justify-content: space-between;
-    border: 1px solid black;
-}
-.challengeWrapper{
+.challengeSection{
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-evenly;
+
+}
+.startChallenge{
+    width: 400px;
+    border: 1px solid black;
+    border-radius: 10px;
+    color:#262522;
+    background-image: linear-gradient(to bottom right, #FFFFFF, #DfDfDf);
+
+}
+.challengeWrapper{
+    display: flex;
+    flex-direction: column;
+    width:100%;
+}
+.sectionTitle{
+    font-size: 1.2em;
+    font-weight: 600;
+    text-align: center;
 }

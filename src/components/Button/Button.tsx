@@ -2,7 +2,7 @@ import React, { MouseEventHandler, ReactElement, ReactNode } from 'react';
 import './Button.css';
 
 export default function Button(props: {
-	onClick: MouseEventHandler<HTMLDivElement>;
+	onClick: MouseEventHandler<HTMLButtonElement>;
 	onRightClick?: Function;
 	children?: ReactNode | ReactElement;
 	tooltipContent?: string;
@@ -10,7 +10,7 @@ export default function Button(props: {
 	icon?: string;
 }) {
 	return (
-		<div
+		<button
 			className='custom-button'
 			onClick={props.onClick}
 			onContextMenu={(e) => {
@@ -27,6 +27,6 @@ export default function Button(props: {
 			>
 				<i className={props.icon} />
 			</span>
-		</div>
+		</button>
 	);
 }

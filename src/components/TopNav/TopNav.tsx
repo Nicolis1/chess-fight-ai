@@ -24,7 +24,9 @@ export default function TopNav(props) {
 				<span className='userIndicator'>
 					{activeUser?.username && activeUser.username}
 				</span>
-				<SignoutButton withText={false} />
+				<div className='signout'>
+					<SignoutButton withText={false} />
+				</div>
 			</div>
 		</div>
 	);

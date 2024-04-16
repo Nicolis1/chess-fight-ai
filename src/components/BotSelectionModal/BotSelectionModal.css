@@ -10,9 +10,11 @@
     background-color: rgba(0,0,0,0.9);
 }
 .modalContainer{
-    height: 70%;
+    height: fit-content;
+    max-height: 70%;
+    min-height: 40%;
     width:600px;
-    background-color: azure;
+    background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);
     border:1px solid black;
     padding: 16px;
     display: flex;
@@ -22,6 +24,7 @@
 .modalTitle{
     display: flex;
     justify-content: space-between;
+    color:#262522;
 }
 .modalTitle .close{
     font-size: 2em;
@@ -37,6 +40,8 @@
     height: 100%;
     overflow: auto;
     cursor: pointer;
+    padding: 20px;
+    padding-top: 0px;
 }
 .botToSelect{
     height: 30px;
@@ -47,13 +52,13 @@
     background-color: #B58863;
 }
 .botToSelect:nth-child(even){
-    background-color: #F0D9B5;
+    background-color: #8a6241;
 }
 .botToSelect:hover{
-    background-color: #FFFAAF;
+    background-color: #008CD1;
 }
 .botToSelect.selected{
-    background-color: #4F4F4F;
+    background-color: #008CD1;
 }
 .botToSelect{
     border-bottom:1px solid #999;

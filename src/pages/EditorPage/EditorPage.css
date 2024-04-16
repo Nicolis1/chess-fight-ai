@@ -15,7 +15,7 @@
     height:100%;
     display: flex;
     flex-direction: column;
-    background-color: #EFEEEA;
+    background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);
 }
 .gameVisualization{
     width:300px;
@@ -41,7 +41,7 @@
 .titleBar{
     display: flex;
     justify-content: space-between;
-    background-color: #EFEEEA;
+    background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);
     border-bottom:1px solid black ;
 }
 .displayTitle{
@@ -80,4 +80,11 @@
 }
 #opponentBotTitle{
     text-wrap: nowrap;
+}
+.editorButtons button{
+    background: none;
+    padding: 8px;
+    margin-right: 4px;
+    border: 1px solid black;
+    border-radius: 5px;
 }

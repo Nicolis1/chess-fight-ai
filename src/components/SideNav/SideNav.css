@@ -1,6 +1,6 @@
 .sideNav{
     height: 100%;
-    background-color: #EFEEEA;
+    background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);
     display: flex;
     flex-direction: column;
     transition: 0.5s; 
@@ -20,25 +20,38 @@
     justify-content: space-between;
     box-sizing: border-box;
     padding: 12px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .sideNavContent h1{
     margin: 0;
 }
 .sideNavContent .custom-button{
-    margin-top: 4px;
+    margin-top: 8px;
     border-radius: 5px;
-    border: 1px solid #2f2f2f;
     box-sizing: border-box;
-    padding: 4px;
+    padding: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .toggleButton{
     height:100%;
     width: 20px;
     display: flex;
-    font-size: .8em;
-    background-color: #B58863;
+    padding: 0px;
+    background-color: #008CD1;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border:none;
 }
+.toggleButton span{
+    font-size: 1.2em;
+    color: #edebe9;
+}
+.toggleButton:hover{
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) inset;
+
+}
+
 
 .sideNavContent .actionButtons{
     margin-top: 16px;

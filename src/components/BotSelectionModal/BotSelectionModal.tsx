@@ -47,44 +47,46 @@ function BotSelectionModal(props: {
 					e.stopPropagation();
 				}}
 			>
-				<div className='modalTitle'>
-					<h2>{title}</h2>
-					<button
-						className='close'
-						onClick={() => {
-							props.hideModal();
-						}}
-					>
-						<span className='icon-close' />
-					</button>
-				</div>
-				<div className='botsToSelect'>
-					{props.bots.map((bot) => {
-						return (
-							<div
-								key={bot.id}
-								onClick={(e) => {
-									setSelectedBot(bot);
-								}}
-								className={
-									selectedBot?.id === bot.id
-										? 'botToSelect selected'
-										: 'botToSelect'
-								}
-							>
-								{(bot?.name || '?').substring(0, 40)}
-								{bot?.name.length > 40 ? '...' : ''}
-								<span
+				<div>
+					<div className='modalTitle'>
+						<h2>{title}</h2>
+						<button
+							className='close'
+							onClick={() => {
+								props.hideModal();
+							}}
+						>
+							<span className='icon-close' />
+						</button>
+					</div>
+					<div className='botsToSelect'>
+						{props.bots.map((bot) => {
+							return (
+								<div
+									key={bot.id}
 									onClick={(e) => {
-										alert(bot.code);
-										e.stopPropagation();
+										setSelectedBot(bot);
 									}}
+									className={
+										selectedBot?.id === bot.id
+											? 'botToSelect selected'
+											: 'botToSelect'
+									}
 								>
-									View Code <span className='icon-arrow-right' />
-								</span>
-							</div>
-						);
-					})}
+									{(bot?.name || '?').substring(0, 40)}
+									{bot?.name.length > 40 ? '...' : ''}
+									<span
+										onClick={(e) => {
+											alert(bot.code);
+											e.stopPropagation();
+										}}
+									>
+										View Code <span className='icon-arrow-right' />
+									</span>
+								</div>
+							);
+						})}
+					</div>
 				</div>
 				<div className='footerButtons'>
 					<button
