@@ -7,8 +7,6 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import dataStore from './data/stores/dataStore.ts';
 
-import 'simple-line-icons/css/simple-line-icons.css';
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<Provider store={dataStore}>
