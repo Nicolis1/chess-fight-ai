@@ -23,7 +23,7 @@ export default function SideNav(props) {
 	}, [activeCodeID]);
 	return (
 		<div className={collapsed ? 'sideNav collapsed' : 'sideNav expanded'}>
-			<div className='container'>
+			<div className='sidenav-container'>
 				{!collapsed && (
 					<div className='sideNavContent'>
 						<div>

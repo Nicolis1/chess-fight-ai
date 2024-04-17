@@ -1,3 +1,10 @@
+.sidenav-container{
+    display: flex;
+    flex:1;
+    overflow: hidden;
+    height: 100%;
+}
+
 .sideNav{
     height: 100%;
     background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);

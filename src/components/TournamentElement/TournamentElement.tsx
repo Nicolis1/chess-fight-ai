@@ -4,7 +4,7 @@ import { Tournament, joinTournament } from '../../data/api/challenges.ts';
 import React from 'react';
 import BotSelectionModal, {
 	ChallengeEvent,
-} from '../BotSelectionModal/BotSelectionModal.tsx';
+} from '../Modals/BotSelectionModal.tsx';
 import Button from '../Button/Button.tsx';
 import './TournamentElement.css';
 
@@ -37,7 +37,7 @@ function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 					<div className='participantsWrapper'>
 						{participants.slice(0, 5).map((participant) => {
 							return (
-								<div className='participant'>
+								<div className='participant' key={participant.id}>
 									<div className='botName'>
 										<button
 											onClick={() => {

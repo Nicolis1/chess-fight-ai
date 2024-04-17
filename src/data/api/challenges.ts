@@ -1,6 +1,7 @@
+import { Result } from '../../components/ResultsPill/ResultsPill';
 import { BotData } from './bots';
 
-export type MatchData = any; // todo update this with proper type
+export type MatchData = Result; // todo update this with proper type
 
 export type Tournament = {
 	challengeId: string;
@@ -86,10 +87,11 @@ export async function fetchChallenges(): Promise<Tournament[]> {
 		console.log(resp);
 		const challengesForReturn: Tournament[] = [];
 		for (let tournament of JSON.parse(await resp.json())?.challenges) {
-			console.log(tournament);
+			const matchData = atob(tournament.match_data.$binary.base64);
+			const parsedMatchData = JSON.parse(matchData).output.results;
 			challengesForReturn.push({
 				challengeId: tournament.challengeid,
-				matchData: tournament.match_data,
+				matchData: parsedMatchData,
 				participants: tournament.participantData.map((pData): BotData => {
 					return {
 						name: pData.botName,

@@ -1,6 +1,10 @@
 .challengePage{
-    height: 100%;
+    background-color:  #f0d9b5;
     background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);
+    width: 100%;
+    overflow-x: hidden;
+    height: 100%;
+   
 }
 .tournamentWrapper{
     display: flex;
@@ -12,25 +16,32 @@
 .challengeSection{
     display: flex;
     flex-direction: row;
-    width: 100%;
     justify-content: space-evenly;
+    height: fit-content;
+    max-height:600px;
 
 }
-.startChallenge{
+.challenge-subsection{
     width: 400px;
     border: 1px solid black;
     border-radius: 10px;
     color:#262522;
     background-image: linear-gradient(to bottom right, #FFFFFF, #DfDfDf);
-
+    overflow: auto;
+    margin: 20px;
 }
 .challengeWrapper{
     display: flex;
     flex-direction: column;
     width:100%;
+    overflow: auto;
 }
 .sectionTitle{
     font-size: 1.2em;
     font-weight: 600;
     text-align: center;
+}
+.challengeWrapper .header{
+    padding: 4px;
+    font-weight: 500;
 }

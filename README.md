@@ -7,6 +7,8 @@ Known bugs:
 - view code in bot selection modal should have special hover behavior
 - the way I have use effects set up to fetch data causes several rerenders, with several extra api calls
 - security issues form packages
+- edit pencil no longer appears when hovering title on editor page
+- state does not refresh upon a new challenge result finishing (add loading state to challenge request)
 
 - todo
   - better style bot selection modal
@@ -22,4 +24,7 @@ Known bugs:
   - delete account
   - add caching to server
   - script to schedule / run tournaments
+  - active page selector for topnav
+  - make scrollbars less bad looking
+  - actually integrate the login w/
   

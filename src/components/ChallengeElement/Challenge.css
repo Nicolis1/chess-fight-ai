@@ -5,8 +5,6 @@
     align-items: center;
     text-wrap: nowrap;
     width: 100%;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
 }
 .challenge:nth-child(even){
     background-color: #DfDfDf;
@@ -15,7 +13,6 @@
     text-wrap: nowrap;
     overflow: hidden;
 }
-
 .challenger{
     display: flex;
     flex-direction: row;
@@ -48,4 +45,36 @@
 }
 .joinChallenge:hover{
     box-shadow: 2px 2px 4px rgba(255,255,255, 0.5) inset;
+}
+.recent .botName{
+    margin-left: 8px;
+    margin-right: 8px;
+    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.playerName{
+    text-align: left;
+ 
+}
+.opponentName{
+   text-align: right;
+}
+.winner{
+    color:#03C04A;
+}
+.loser{
+    color: #C61A09;
+}
+.draw{
+    color:#DE970B;
+}
+.recent.challenge{
+    cursor: pointer;
+}
+.recent.challenge:hover::before{
+    content: "see results";
+    color: #008CD1;
+    text-decoration: underline;
+    cursor: pointer;
 }

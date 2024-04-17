@@ -3,11 +3,11 @@ import { BotData } from '../../data/api/bots.ts';
 import React from 'react';
 import BotSelectionModal, {
 	ChallengeEvent,
-} from '../BotSelectionModal/BotSelectionModal.tsx';
+} from '../Modals/BotSelectionModal.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKhanda } from '@fortawesome/free-solid-svg-icons';
 
-import './StartChallenge.css';
+import './Challenge.css';
 function StartChallenge(props: {
 	id?: string;
 	name: string;
@@ -40,7 +40,6 @@ function StartChallenge(props: {
 						}}
 					>
 						{props.name.substring(0, 25)}
-						{props.name.length > 25 ? '(etc)' : ''}
 					</button>
 				</div>
 				<div className='dots'>
@@ -52,6 +51,8 @@ function StartChallenge(props: {
 					onClick={() => {
 						setDisplayModal(true);
 					}}
+					data-tooltip-id='challenge-page'
+					data-tooltip-content={`challenge ${props.name}`}
 				>
 					Challenge <FontAwesomeIcon icon={faKhanda} />
 				</button>

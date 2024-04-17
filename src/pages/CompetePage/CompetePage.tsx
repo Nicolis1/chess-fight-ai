@@ -15,6 +15,7 @@ import './CompetePage.css';
 import { Tooltip } from 'react-tooltip';
 import TournamentElement from '../../components/TournamentElement/TournamentElement.tsx';
 import StartChallenge from '../../components/ChallengeElement/StartChallenge.tsx';
+import RecentChallenge from '../../components/ChallengeElement/RecentChallenge.tsx';
 
 function CompetePage() {
 	const activeUser = useSelector(
@@ -74,16 +75,7 @@ function CompetePage() {
 	);
 	const recentChallengeComponents = recentChallenges.map((challenge) => {
 		return (
-			<>
-				{challenge.participants.map((p) => (
-					<>
-						{p.name}
-						{p.ownerName}
-					</>
-				))}
-				<br />
-				{new Date(challenge.scheduled * 1000).toDateString()}
-			</>
+			<RecentChallenge key={challenge.challengeId} challenge={challenge} />
 		);
 	});
 	const botComponents = challengableBots.map((bot) => {
@@ -93,9 +85,7 @@ function CompetePage() {
 		return (
 			<StartChallenge
 				key={bot.id}
-				name={`${bot.name?.substring(0, 15)}${
-					bot.name?.length > 15 ? '...' : ''
-				}`}
+				name={bot.name}
 				id={bot.id}
 				owner={bot.ownerName}
 				code={bot.code}
@@ -113,32 +103,26 @@ function CompetePage() {
 
 	return (
 		<div className='challengePage'>
-			<h1>Upcoming Tournaments!</h1>
+			<Tooltip id='challenge-page' />
 			<div className='tournamentWrapper'>{tournamentComponents}</div>
-			<hr />
-
-			<h1>Challenges</h1>
 			<div className='challengeSection'>
-				<div className='startChallenge'>
+				<div className='challenge-subsection'>
 					<div className='sectionTitle'>Test Your Mettle</div>
+					<div className='challengeWrapper'>{botComponents}</div>
+				</div>
+				<div className='challenge-subsection'>
+					<div className='sectionTitle'>Your Recent Challenges</div>
 					<div className='challengeWrapper'>
-						<Tooltip id='challenge-bot-button' />
-						<div className='challenges'>{botComponents}</div>
+						<div className='header'>
+							<span style={{ float: 'left' }}>your bot</span>
+							<span style={{ float: 'right' }}>opponent</span>
+						</div>
+						{recentChallengeComponents}
 					</div>
 				</div>
-				<div>
-					<h3>Your Challenges</h3>
-					{recentChallengeComponents}
-				</div>
-				<div>
-					<h3>All Challenges</h3>
-					<ul>
-						<li />
-						<li />
-						<li />
-						<li />
-						<li />
-					</ul>
+				<div className='challenge-subsection'>
+					<div className='sectionTitle'>All Recent Challenges</div>
+					<div className='challengeWrapper'>{recentChallengeComponents}</div>
 				</div>
 			</div>
 		</div>

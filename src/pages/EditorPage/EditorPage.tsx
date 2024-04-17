@@ -32,7 +32,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import BotSelectionModal, {
 	ChallengeEvent,
-} from '../../components/BotSelectionModal/BotSelectionModal.tsx';
+} from '../../components/Modals/BotSelectionModal.tsx';
 
 function EditorPage() {
 	const activeCodeData = useSelector(
@@ -191,7 +191,7 @@ function EditorPage() {
 		}, 500);
 	};
 	return (
-		<div className='container'>
+		<div className='editor-container'>
 			<Tooltip id='editor-button' />
 			<SideNav />
 			<div className='editorSection'>
