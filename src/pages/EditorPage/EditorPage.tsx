@@ -28,6 +28,7 @@ import {
 	faFloppyDisk,
 	faKhanda,
 	faPeace,
+	faPencil,
 	faPlay,
 } from '@fortawesome/free-solid-svg-icons';
 import BotSelectionModal, {
@@ -242,8 +243,9 @@ function EditorPage() {
 								<span
 									data-tooltip-content={'Edit name'}
 									data-tooltip-id={'editor-button'}
-									className='icon-pencil'
-								/>
+								>
+									<FontAwesomeIcon icon={faPencil} />
+								</span>
 							)}
 							{botData?.name}
 						</div>

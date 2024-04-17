@@ -16,6 +16,8 @@ import { Tooltip } from 'react-tooltip';
 import TournamentElement from '../../components/TournamentElement/TournamentElement.tsx';
 import StartChallenge from '../../components/ChallengeElement/StartChallenge.tsx';
 import RecentChallenge from '../../components/ChallengeElement/RecentChallenge.tsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 function CompetePage() {
 	const activeUser = useSelector(
@@ -24,11 +26,32 @@ function CompetePage() {
 	const [tournaments, setTournaments] = useState<Tournament[]>([]);
 	const [challengableBots, setChallengableBots] = useState<BotData[]>([]);
 	const [myBots, setMyBots] = useState<BotData[]>([]);
-	const [recentChallenges, setRecentChallenges] = useState<Tournament[]>([]);
+	const [myRecentChallenges, setMyRecentChallenges] = useState<Tournament[]>(
+		[],
+	);
+	const [allRecentChallenges, setAllRecentChallenges] = useState<Tournament[]>(
+		[],
+	);
+	const [inFlightChallenges, setInFlightChallenges] = useState<
+		{
+			opponent: BotData;
+		}[]
+	>([]);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
 		(async () => {
+			const tournaments = fetchTournaments();
+			const challengeable = fetchChallengable();
+			const myBots = fetchBots();
+			const challenges = fetchChallenges();
+			const allChallenges = fetchChallenges(true);
+			setTournaments(await tournaments);
+			setChallengableBots(await challengeable);
+			setMyBots(await myBots);
+			setMyRecentChallenges(await challenges);
+			setAllRecentChallenges(await allChallenges);
+
 			if (activeUser == null) {
 				fetchActiveUser().then((activeUserData) => {
 					if (activeUserData) {
@@ -41,26 +64,8 @@ function CompetePage() {
 					}
 				});
 			}
-			fetchTournaments().then((tournaments) => {
-				setTournaments(tournaments);
-			});
-			fetchChallengable().then((bots) => {
-				setChallengableBots(bots);
-			});
-
-			fetchBots().then((bots) => {
-				if (bots.length > 0) {
-					setMyBots(bots);
-				}
-			});
-			fetchChallenges().then((challenges) => {
-				if (!!challenges) {
-					setRecentChallenges(challenges);
-					console.log(challenges);
-				}
-			});
 		})();
-	}, [dispatch]);
+	}, [dispatch, inFlightChallenges]);
 
 	const tournamentComponents = tournaments.map(
 		(tournament: Tournament, index) => {
@@ -73,7 +78,16 @@ function CompetePage() {
 			);
 		},
 	);
-	const recentChallengeComponents = recentChallenges.map((challenge) => {
+	const allRecentChallengeComponents = allRecentChallenges.map((challenge) => {
+		return (
+			<RecentChallenge
+				key={challenge.challengeId}
+				challenge={challenge}
+				forAllChallenges={true}
+			/>
+		);
+	});
+	const recentChallengeComponents = myRecentChallenges.map((challenge) => {
 		return (
 			<RecentChallenge key={challenge.challengeId} challenge={challenge} />
 		);
@@ -85,19 +99,32 @@ function CompetePage() {
 		return (
 			<StartChallenge
 				key={bot.id}
-				name={bot.name}
-				id={bot.id}
-				owner={bot.ownerName}
-				code={bot.code}
+				botData={bot}
 				eligibleBots={myBots}
+				disabled={!!inFlightChallenges.length}
 				onChallenge={(botForChallenge) => {
 					if (botForChallenge?.id && bot?.id) {
-						challengeBot(botForChallenge.id, bot.id).then((resp) => {
-							console.log('challenge completed: ', resp);
-						});
+						setInFlightChallenges([...inFlightChallenges, { opponent: bot }]);
+						challengeBot(botForChallenge.id, bot.id)
+							.then((resp) => {
+								console.log('challenge completed: ', resp);
+							})
+							.finally(() => {
+								setInFlightChallenges([]);
+							});
 					}
 				}}
 			/>
+		);
+	});
+	const inFlightChallengesComponents = inFlightChallenges.map((challenge) => {
+		return (
+			<div key={challenge.opponent.id} className='pending challenge'>
+				<span>Pending challenge against {challenge.opponent.name}</span>
+				<div className='spinner'>
+					<FontAwesomeIcon icon={faSpinner} />
+				</div>
+			</div>
 		);
 	});
 
@@ -117,12 +144,13 @@ function CompetePage() {
 							<span style={{ float: 'left' }}>your bot</span>
 							<span style={{ float: 'right' }}>opponent</span>
 						</div>
+						{inFlightChallengesComponents}
 						{recentChallengeComponents}
 					</div>
 				</div>
 				<div className='challenge-subsection'>
 					<div className='sectionTitle'>All Recent Challenges</div>
-					<div className='challengeWrapper'>{recentChallengeComponents}</div>
+					<div className='challengeWrapper'>{allRecentChallengeComponents}</div>
 				</div>
 			</div>
 		</div>

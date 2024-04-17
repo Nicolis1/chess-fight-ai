@@ -56,13 +56,13 @@
 .displayTitle:hover{
     cursor: text;
 }
-.displayTitle .icon-pencil{
+.displayTitle span{
     float: right;
     display: flex;
     height: 100%;
     align-items: center;
 }
-.displayTitle .icon-pencil:hover{
+.displayTitle span:hover{
     cursor: pointer; 
 }
 .titleBar input{

@@ -51,6 +51,8 @@
     justify-content: space-between;
     padding: 4px;
     background-color: #B58863;
+    cursor: pointer;
+    border-bottom:1px solid #999;
 }
 .botToSelect:nth-child(even){
     background-color: #8a6241;
@@ -61,8 +63,11 @@
 .botToSelect.selected{
     background-color: #008CD1;
 }
-.botToSelect{
-    border-bottom:1px solid #999;
+.botToSelect .viewCode{
+    height:100%;
+    font-size: .9em;
+    font-weight: 600;
+    width: fit-content;
 }
 
 .footerButtons{
@@ -96,4 +101,13 @@ button.select:hover{
 button.select:hover:disabled{
     background-color: #03C04A;
     cursor: not-allowed;
+}
+#bot-code-visual{
+    height: 100%;
+    width: 100%;
+    resize: none;
+}
+.bot-code-wrapper{
+    height: 600px;
+    width:100%;
 }

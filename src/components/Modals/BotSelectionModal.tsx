@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { BotData } from '../../data/api/bots';
-import './BotSelectionModal.css';
+import './Modals.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight, faClose } from '@fortawesome/free-solid-svg-icons';
+import BotVisualizationModal from './BotVisualizationModal.tsx';
 
 export enum ChallengeEvent {
 	Challenge,
@@ -14,6 +17,8 @@ function BotSelectionModal(props: {
 	forEvent: ChallengeEvent;
 }) {
 	const [selectedBot, setSelectedBot] = useState<BotData>(props.bots[0]);
+	const [botToVisualize, setBotToVisualize] = useState<BotData | null>(null);
+
 	if (!props.displayModal) {
 		return null;
 	}
@@ -41,52 +46,58 @@ function BotSelectionModal(props: {
 				e.stopPropagation();
 			}}
 		>
+			<BotVisualizationModal
+				displayModal={!!botToVisualize}
+				hideModal={() => {
+					setBotToVisualize(null);
+				}}
+				botData={botToVisualize}
+			/>
 			<div
 				className='modalContainer'
 				onClick={(e) => {
 					e.stopPropagation();
 				}}
 			>
-				<div>
-					<div className='modalTitle'>
-						<h2>{title}</h2>
-						<button
-							className='close'
-							onClick={() => {
-								props.hideModal();
-							}}
-						>
-							<span className='icon-close' />
-						</button>
-					</div>
-					<div className='botsToSelect'>
-						{props.bots.map((bot) => {
-							return (
-								<div
-									key={bot.id}
+				<div className='modalTitle'>
+					<h2>{title}</h2>
+					<button
+						className='close'
+						onClick={() => {
+							props.hideModal();
+						}}
+					>
+						<FontAwesomeIcon icon={faClose} />
+					</button>
+				</div>
+				<div className='botsToSelect'>
+					{props.bots.map((bot) => {
+						return (
+							<div
+								key={bot.id}
+								onClick={(e) => {
+									setSelectedBot(bot);
+								}}
+								className={
+									selectedBot?.id === bot.id
+										? 'botToSelect selected'
+										: 'botToSelect'
+								}
+							>
+								{(bot?.name || '?').substring(0, 40)}
+								{bot?.name.length > 40 ? '...' : ''}
+								<button
 									onClick={(e) => {
-										setSelectedBot(bot);
+										setBotToVisualize(bot);
+										e.stopPropagation();
 									}}
-									className={
-										selectedBot?.id === bot.id
-											? 'botToSelect selected'
-											: 'botToSelect'
-									}
+									className='viewCode custom-button'
 								>
-									{(bot?.name || '?').substring(0, 40)}
-									{bot?.name.length > 40 ? '...' : ''}
-									<span
-										onClick={(e) => {
-											alert(bot.code);
-											e.stopPropagation();
-										}}
-									>
-										View Code <span className='icon-arrow-right' />
-									</span>
-								</div>
-							);
-						})}
-					</div>
+									View Code <FontAwesomeIcon icon={faArrowRight} />
+								</button>
+							</div>
+						);
+					})}
 				</div>
 				<div className='footerButtons'>
 					<button

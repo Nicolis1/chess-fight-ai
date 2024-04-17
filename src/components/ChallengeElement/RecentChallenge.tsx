@@ -5,27 +5,43 @@ import { useSelector } from 'react-redux';
 import { ActiveState } from '../../data/stores/dataStore.ts';
 import { Result } from '../ResultsPill/ResultsPill.tsx';
 
-function RecentChallenge(props: { challenge: Tournament }) {
+function RecentChallenge(props: {
+	challenge: Tournament;
+	forAllChallenges?: boolean;
+}) {
 	const activeUser = useSelector(
 		(state: ActiveState) => state.activeUser.value,
 	);
-	// the first participant is typically the active user, but this is not documented behavior, so doing this to verify
 	let opponentName = '';
+	let opponentId = '';
 	let playerName = '';
-	for (let participant of props.challenge.participants) {
-		if (participant.ownerName === activeUser?.username) {
-			playerName = participant.name;
-		} else {
-			opponentName = participant.name;
+	let playerId = '';
+
+	if (props.forAllChallenges) {
+		playerName = props.challenge.participants[0].name;
+		playerId = props.challenge.participants[0].id;
+		opponentName = props.challenge.participants[1].name;
+		opponentId = props.challenge.participants[1].id;
+	} else {
+		for (let participant of props.challenge.participants) {
+			if (participant.ownerName === activeUser?.username) {
+				playerName = participant.name;
+				playerId = participant.id;
+			} else {
+				opponentName = participant.name;
+				opponentId = participant.id;
+			}
 		}
 	}
+
 	let playerWins = 0;
 	let oppWins = 0;
 	let draws = 0;
+
 	for (let result of props.challenge.matchData) {
-		if (result.winner == activeUser?.id) {
+		if (result.winner == playerId) {
 			playerWins++;
-		} else if (result.winner != null) {
+		} else if (result.winner == opponentId) {
 			oppWins++;
 		} else {
 			draws++;

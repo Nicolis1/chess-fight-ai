@@ -46,6 +46,10 @@
 .joinChallenge:hover{
     box-shadow: 2px 2px 4px rgba(255,255,255, 0.5) inset;
 }
+.joinChallenge:disabled{
+    cursor: not-allowed;
+    background-image: linear-gradient(to bottom, hsl(0, 2%, 72%), hsl(0, 0%, 73%) 100%);
+}
 .recent .botName{
     margin-left: 8px;
     margin-right: 8px;

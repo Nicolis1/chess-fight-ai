@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { BotData } from '../../data/api/bots.ts';
 import { Tournament, joinTournament } from '../../data/api/challenges.ts';
 import React from 'react';
@@ -7,10 +7,24 @@ import BotSelectionModal, {
 } from '../Modals/BotSelectionModal.tsx';
 import Button from '../Button/Button.tsx';
 import './TournamentElement.css';
+import BotVisualizationModal from '../Modals/BotVisualizationModal.tsx';
 
 function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 	const [displayModal, setDisplayModal] = useState(false);
 	const [participants, setParticipants] = useState(props.participants);
+	const [botToVisualize, setBotToVisualize] = useState<BotData | null>(null);
+	const [seeMore, setSeeMore] = useState(false);
+
+	const toggleSeeMore = useCallback(() => {
+		setSeeMore(!seeMore);
+	}, [seeMore]);
+	const hideSelectionModal = useCallback(() => {
+		setDisplayModal(false);
+	}, []);
+	const hideVisualizationModal = useCallback(() => {
+		setBotToVisualize(null);
+	}, []);
+
 	return (
 		<div key={props.challengeId} className='tournament'>
 			<div>
@@ -22,9 +36,12 @@ function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 						setParticipants([selectedBot, ...participants]);
 						joinTournament(selectedBot.id, props.challengeId);
 					}}
-					hideModal={() => {
-						setDisplayModal(false);
-					}}
+					hideModal={hideSelectionModal}
+				/>
+				<BotVisualizationModal
+					botData={botToVisualize}
+					displayModal={!!botToVisualize}
+					hideModal={hideVisualizationModal}
 				/>
 				<div className='title'>{props.name}</div>
 				<div className='subtitle'>
@@ -35,28 +52,32 @@ function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 				</div>
 				{!!participants.length ? (
 					<div className='participantsWrapper'>
-						{participants.slice(0, 5).map((participant) => {
-							return (
-								<div className='participant' key={participant.id}>
-									<div className='botName'>
-										<button
-											onClick={() => {
-												alert(participant.code);
-											}}
-										>
-											{participant.name.substring(0, 25)}
-											{participant.name.length > 25 ? '(etc)' : ''}
-										</button>
+						{participants
+							.slice(0, seeMore ? participants.length : 5)
+							.map((participant) => {
+								return (
+									<div className='participant' key={participant.id}>
+										<div className='botName'>
+											<button
+												onClick={() => {
+													setBotToVisualize(participant);
+												}}
+											>
+												{participant.name.substring(0, 25)}
+												{participant.name.length > 25 ? '(etc)' : ''}
+											</button>
+										</div>
+										<div className='dots'>
+											................................................................................................................................................................
+										</div>
+										<div className='author'>{participant.ownerName}</div>
 									</div>
-									<div className='dots'>
-										................................................................................................................................................................
-									</div>
-									<div className='author'>{participant.ownerName}</div>
-								</div>
-							);
-						})}
+								);
+							})}
 						{participants.length > 5 && (
-							<button className='seeMore'>see more</button>
+							<button className='seeMore' onClick={toggleSeeMore}>
+								{seeMore ? 'show less' : 'see more'}
+							</button>
 						)}
 					</div>
 				) : (

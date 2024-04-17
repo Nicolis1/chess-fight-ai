@@ -454,6 +454,67 @@ def get_challenges_current_user():
 
     #todo add logic to return only upcoming and recently finished challenges
     return parse_json({'challenges':recent_challenges}), 200
+@app.route('/challenges/direct/all', methods=['GET'])
+def get_challenges_all():
+    recent_challenges = challengesCollection.aggregate([
+        {
+            "$match": { "type": "challenge" } 
+        },
+        {
+            "$lookup": {
+            "from": "bots", 
+            "localField": "participants", 
+            "foreignField": "botid",
+            "as": "participantsData" 
+            }
+        },
+        { 
+            "$unwind": {
+            "path": "$participantsData",
+            "preserveNullAndEmptyArrays": True
+            }
+        }, 
+
+        {
+            "$lookup": {
+            "from": "users", 
+            "localField": "participantsData.owner", 
+            "foreignField": "userid",
+            "as": "userData" 
+            }
+        },
+        {
+            "$addFields": {
+                "participantData":{
+                    "$cond": {
+                    "if": { "$eq": [{ "$size": "$userData" }, 0] },
+                    "then": "$$REMOVE",
+                    "else": {
+                        "username":{"$first":"$userData.username"},
+                                    "botName":"$participantsData.name",
+                                    "code":"$participantsData.code",
+                                    "botid":"$participantsData.botid",
+                                    "challengable":"$participantsData.challengable"} ,
+                    }
+                }
+            }
+        },
+        {
+            "$group":{
+                "_id": "$_id",
+                "participantData":{"$push":"$participantData"},
+               "type":{"$first":"$type"},
+               "challengeid":{"$first":"$challengeid"},
+               "scheduled":{"$first":"$scheduled"},
+               "match_data":{"$first":"$match_data"},
+               "name":{"$first":"$name"},
+            }
+        },
+        { "$sort" : { "scheduled" : -1 } }
+    ])
+
+    #todo add logic to return only upcoming and recently finished challenges
+    return parse_json({'challenges':recent_challenges}), 200
 
 
 def parse_json(data):

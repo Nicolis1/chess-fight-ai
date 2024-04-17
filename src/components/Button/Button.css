@@ -11,7 +11,7 @@
     font-weight: 400;
 }
 .custom-button:hover{
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 4px 2px 5px rgba(0, 0, 0, 0.7);
     cursor: pointer;
 }
 .custom-button .text{

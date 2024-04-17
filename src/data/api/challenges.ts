@@ -79,12 +79,12 @@ export async function joinTournament(botId: string, tournamentId: string) {
 	}
 }
 
-export async function fetchChallenges(): Promise<Tournament[]> {
+export async function fetchChallenges(all = false): Promise<Tournament[]> {
 	try {
-		const resp = await fetch('/challenges/direct', {
+		const url = all ? 'challenges/direct/all' : '/challenges/direct';
+		const resp = await fetch(url, {
 			method: 'GET',
 		});
-		console.log(resp);
 		const challengesForReturn: Tournament[] = [];
 		for (let tournament of JSON.parse(await resp.json())?.challenges) {
 			const matchData = atob(tournament.match_data.$binary.base64);
