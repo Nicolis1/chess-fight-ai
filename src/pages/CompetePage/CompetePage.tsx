@@ -108,13 +108,9 @@ function CompetePage() {
 				onChallenge={(botForChallenge) => {
 					if (botForChallenge?.id && bot?.id) {
 						setInFlightChallenges([...inFlightChallenges, { opponent: bot }]);
-						challengeBot(botForChallenge.id, bot.id)
-							.then((resp) => {
-								console.log('challenge completed: ', resp);
-							})
-							.finally(() => {
-								setInFlightChallenges([]);
-							});
+						challengeBot(botForChallenge.id, bot.id).finally(() => {
+							setInFlightChallenges([]);
+						});
 					}
 				}}
 			/>

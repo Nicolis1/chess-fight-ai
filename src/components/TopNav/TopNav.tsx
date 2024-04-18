@@ -12,7 +12,6 @@ export default function TopNav(props) {
 	const activePage = useSelector(
 		(state: ActiveState) => state.activePage.value,
 	);
-	console.log(activePage);
 	return (
 		<div className='topNav'>
 			<div className='main-content'>

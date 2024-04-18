@@ -29,6 +29,7 @@ import {
 	faPeace,
 	faPencil,
 	faPlay,
+	faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import BotSelectionModal, {
 	ChallengeEvent,
@@ -249,6 +250,11 @@ function EditorPage() {
 									data-tooltip-id={'editor-button'}
 								>
 									<FontAwesomeIcon icon={faPencil} />
+								</span>
+							)}
+							{!botData && (
+								<span className='spinner'>
+									<FontAwesomeIcon icon={faSpinner} />
 								</span>
 							)}
 							{botData?.name}

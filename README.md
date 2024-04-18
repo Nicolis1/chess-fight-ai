@@ -7,7 +7,6 @@ Known bugs:
 - security issues form packages
 - fetching duplicate data with all chalenges/ my challenges
 - error handling for failed login
-- can't save if editor scrolls down too far
 
 - todo
   - do your recent matches ui

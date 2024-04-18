@@ -5,7 +5,6 @@ import useCodeMirror from './useCodeMirror.ts';
 
 export function useCodeEditor({ value, onChange, extensions }) {
 	const { ref, view } = useCodeMirror([onUpdate(onChange), ...extensions]);
-	console.log(ref);
 
 	useEffect(() => {
 		if (view) {
