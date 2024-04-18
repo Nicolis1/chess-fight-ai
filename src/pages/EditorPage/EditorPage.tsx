@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import './EditorPage.css';
 import SideNav from '../../components/SideNav/SideNav.tsx';
+import { useCodeEditor } from '../../data/useCodeEditor.ts';
 
-import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
 import { simulateGames } from '../../data/utils.ts';
@@ -35,6 +34,9 @@ import BotSelectionModal, {
 	ChallengeEvent,
 } from '../../components/Modals/BotSelectionModal.tsx';
 import { Page, setActivePage } from '../../data/features/activePageSlice.ts';
+import CodeEditor from '../../components/CodeEditor.tsx';
+import { EditorView, basicSetup } from 'codemirror';
+import { javascript } from '@codemirror/lang-javascript';
 
 function EditorPage() {
 	const activeCodeData = useSelector(
@@ -295,10 +297,10 @@ function EditorPage() {
 					</div>
 				</div>
 				<div id='editorWrapper'>
-					<CodeMirror
+					<CodeEditor
 						value={botData?.code}
-						extensions={[javascript({ jsx: false })]}
 						onChange={onChange}
+						extensions={[]}
 					/>
 				</div>
 			</div>
