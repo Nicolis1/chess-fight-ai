@@ -3,11 +3,16 @@ import './TopNav.css';
 import React from 'react';
 import { ActiveState } from '../../data/stores/dataStore.ts';
 import SignoutButton from '../Button/SignoutButton.tsx';
+import { Page } from '../../data/features/activePageSlice.ts';
 
 export default function TopNav(props) {
 	const activeUser = useSelector(
 		(state: ActiveState) => state.activeUser.value,
 	);
+	const activePage = useSelector(
+		(state: ActiveState) => state.activePage.value,
+	);
+	console.log(activePage);
 	return (
 		<div className='topNav'>
 			<div className='main-content'>
@@ -17,8 +22,15 @@ export default function TopNav(props) {
 					</a>
 				</div>
 
-				<a href='/compete'>compete</a>
-				<a href='/editor'>create</a>
+				<a
+					href='/compete'
+					id={activePage == Page.CHALLENGES ? 'active-page' : ''}
+				>
+					compete
+				</a>
+				<a href='/editor' id={activePage == Page.EDITOR ? 'active-page' : ''}>
+					create
+				</a>
 			</div>
 			<div className='rightContent'>
 				<span className='userIndicator'>

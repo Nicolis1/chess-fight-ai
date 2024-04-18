@@ -34,6 +34,7 @@ import {
 import BotSelectionModal, {
 	ChallengeEvent,
 } from '../../components/Modals/BotSelectionModal.tsx';
+import { Page, setActivePage } from '../../data/features/activePageSlice.ts';
 
 function EditorPage() {
 	const activeCodeData = useSelector(
@@ -59,6 +60,23 @@ function EditorPage() {
 
 	useEffect(() => {
 		(async () => {
+			dispatch(setActivePage(Page.EDITOR));
+
+			// todo this fetchbots function is called 6 times on editor load, add a debouncer to the api calls.
+			const botsPromise = fetchBots();
+			const bots = await botsPromise;
+			if (activeCodeData) {
+				setBotData(activeCodeData);
+			} else if (bots.length > 0) {
+				dispatch(setActiveCodeData(bots[0]));
+			} else {
+				newBot().then((bot) => {
+					if (bot) dispatch(setActiveCodeData(bot));
+				});
+			}
+			if (bots.length > 0) {
+				setAllBots(bots);
+			}
 			if (activeUser == null) {
 				fetchActiveUser().then((activeUserData) => {
 					if (!activeUserData) {
@@ -73,24 +91,8 @@ function EditorPage() {
 					}
 				});
 			}
-			// todo this fetchbots function is called 6 times on editor load, add a debouncer to the api calls.
-			fetchBots().then((bots) => {
-				if (activeCodeData) {
-					setBotData(activeCodeData);
-				} else if (bots.length > 0) {
-					dispatch(setActiveCodeData(bots[0]));
-				} else {
-					newBot().then((bot) => {
-						if (bot) dispatch(setActiveCodeData(bot));
-					});
-				}
-				if (bots.length > 0) {
-					setAllBots(bots);
-					setSelectedTestOpponentData(bots[0]);
-				}
-			});
 		})();
-	}, [dispatch, activeUser, activeCodeData]);
+	}, [dispatch, activeCodeData]);
 
 	const onChange = (code: string) => {
 		if (botData?.id) setBotData({ ...botData, code });
@@ -297,7 +299,6 @@ function EditorPage() {
 						value={botData?.code}
 						extensions={[javascript({ jsx: false })]}
 						onChange={onChange}
-						height='900px'
 					/>
 				</div>
 			</div>

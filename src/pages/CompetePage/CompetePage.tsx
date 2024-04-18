@@ -18,6 +18,7 @@ import StartChallenge from '../../components/ChallengeElement/StartChallenge.tsx
 import RecentChallenge from '../../components/ChallengeElement/RecentChallenge.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { Page, setActivePage } from '../../data/features/activePageSlice.ts';
 
 function CompetePage() {
 	const activeUser = useSelector(
@@ -41,6 +42,8 @@ function CompetePage() {
 
 	useEffect(() => {
 		(async () => {
+			dispatch(setActivePage(Page.CHALLENGES));
+
 			const tournaments = fetchTournaments();
 			const challengeable = fetchChallengable();
 			const myBots = fetchBots();

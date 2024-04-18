@@ -48,3 +48,6 @@
 .rightContent button:hover{
     font-size: 1.5em;
 }
+#active-page{
+    text-decoration: underline;
+}

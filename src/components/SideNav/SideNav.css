@@ -47,11 +47,12 @@
     background-color: #008CD1;
     display: flex;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
     border:none;
 }
 .toggleButton span{
-    font-size: 1.2em;
+    font-size: 1.5em;
     color: #edebe9;
 }
 .toggleButton:hover{

@@ -7,6 +7,11 @@ import { useSelector } from 'react-redux';
 import BotSelections from './BotSelections.tsx';
 import React from 'react';
 import { ActiveState } from '../../data/stores/dataStore.ts';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+	faChevronLeft,
+	faChevronRight,
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function SideNav(props) {
 	const [collapsed, setCollapsed] = useState(true);
@@ -36,9 +41,13 @@ export default function SideNav(props) {
 					</div>
 				)}
 				<button onClick={toggleCollapse} className='toggleButton'>
-					<span
-						className={collapsed ? 'icon-arrow-right' : 'icon-arrow-left'}
-					/>
+					<span>
+						{collapsed ? (
+							<FontAwesomeIcon icon={faChevronRight} />
+						) : (
+							<FontAwesomeIcon icon={faChevronLeft} />
+						)}
+					</span>
 				</button>
 			</div>
 		</div>
