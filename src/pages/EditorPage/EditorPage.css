@@ -7,8 +7,10 @@
 .editorSection{
     flex-grow: 100;
     height: 100%;
+    display: flex;
     overflow-y: hidden;
     border-right:1px solid black;
+    flex-direction: column;
 }
 .debugger{
     width:300px;
@@ -44,6 +46,7 @@
     justify-content: space-between;
     background-image: linear-gradient(to left bottom, #edebe9, #efe6dc, #f0e2cf, #f1ddc2, #f0d9b5);
     border-bottom:1px solid black ;
+    height: fit-content;
 }
 .displayTitle{
     font-size: 2em;

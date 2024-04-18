@@ -299,6 +299,7 @@ function EditorPage() {
 						value={botData?.code}
 						extensions={[javascript({ jsx: false })]}
 						onChange={onChange}
+						height='1000px'
 					/>
 				</div>
 			</div>
