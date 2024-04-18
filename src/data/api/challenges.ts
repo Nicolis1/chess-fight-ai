@@ -1,4 +1,3 @@
-import { Result } from '../../components/ResultsPill/ResultsPill';
 import { BotData } from './bots';
 
 export type MatchData = Result; // todo update this with proper type
@@ -10,6 +9,14 @@ export type Tournament = {
 	scheduled: number;
 	type: string;
 	name: string;
+};
+export type Result = {
+	draw: boolean;
+	moves: string[];
+	turns: number;
+	whitePieces: string;
+	winner: string | null;
+	reachedMoveLimit: boolean;
 };
 
 export async function fetchTournaments(): Promise<Tournament[]> {

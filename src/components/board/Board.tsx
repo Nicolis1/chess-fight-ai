@@ -3,7 +3,7 @@ import './Board.css';
 
 import { Chessboard } from 'react-chessboard';
 
-export default function Board(props) {
+export default function Board(props: { position: string }) {
 	return (
 		<div className='board'>
 			<Chessboard

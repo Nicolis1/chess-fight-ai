@@ -6,7 +6,6 @@ import { useCodeEditor } from '../../data/useCodeEditor.ts';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
 import { simulateGames } from '../../data/utils.ts';
-import TestResults from '../../components/TestResults/TestResultsTable.tsx';
 import { Tooltip } from 'react-tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
@@ -20,7 +19,6 @@ import {
 	postBotChallenable,
 } from '../../data/api/bots.ts';
 import { fetchActiveUser } from '../../data/api/users.ts';
-import { Result } from '../../components/ResultsPill/ResultsPill.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
 	faCopy,
@@ -38,6 +36,7 @@ import { Page, setActivePage } from '../../data/features/activePageSlice.ts';
 import CodeEditor from '../../components/CodeEditor.tsx';
 import { EditorView, basicSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { Result } from '../../data/api/challenges.ts';
 
 function EditorPage() {
 	const activeCodeData = useSelector(
@@ -175,27 +174,6 @@ function EditorPage() {
 		});
 	}, [botData, dispatch]);
 
-	const playMoves = (moves) => {
-		const movesClone = [...moves];
-		if (intervalID != null) {
-			clearInterval(intervalID);
-		}
-		let game = new Chess();
-		// quick delay before starting to readjust focus visually
-		setDisplayFen(game.fen());
-
-		setTimeout(() => {
-			const id = setInterval(() => {
-				if (movesClone.length > 0) {
-					game.move(movesClone.shift());
-				} else {
-					clearInterval(id);
-				}
-				setDisplayFen(game.fen());
-			}, 150);
-			setIntervalID(id);
-		}, 500);
-	};
 	return (
 		<div className='editor-container'>
 			<Tooltip id='editor-button' />
@@ -321,13 +299,7 @@ function EditorPage() {
 						</h1>
 					</div>
 					{calculating && 'calculating'}
-					{results != null && activeCodeData && (
-						<TestResults
-							results={results}
-							playMoves={playMoves}
-							playerId={activeCodeData.id}
-						/>
-					)}
+					results will go here when done
 				</div>
 			</div>
 		</div>

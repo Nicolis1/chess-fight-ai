@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useEffect } from 'react';
 import type { ActiveState } from '../../data/stores/dataStore.ts';
 import { setActiveUser } from '../../data/features/activeUserSlice.ts';
@@ -15,10 +15,13 @@ import './CompetePage.css';
 import { Tooltip } from 'react-tooltip';
 import TournamentElement from '../../components/TournamentElement/TournamentElement.tsx';
 import StartChallenge from '../../components/ChallengeElement/StartChallenge.tsx';
-import RecentChallenge from '../../components/ChallengeElement/RecentChallenge.tsx';
+import RecentChallenge, {
+	ChallengeData,
+} from '../../components/ChallengeElement/RecentChallenge.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { Page, setActivePage } from '../../data/features/activePageSlice.ts';
+import ResultsModal from '../../components/Modals/ResultsModal.tsx';
 
 function CompetePage() {
 	const activeUser = useSelector(
@@ -39,6 +42,15 @@ function CompetePage() {
 		}[]
 	>([]);
 	const dispatch = useDispatch();
+	const [selectedChallengeData, setSelectedChallengeData] =
+		useState<ChallengeData | null>(null);
+
+	const hideModal = useCallback(() => {
+		setSelectedChallengeData(null);
+	}, []);
+	const onExpand = useCallback((challengeData) => {
+		setSelectedChallengeData(challengeData);
+	}, []);
 
 	useEffect(() => {
 		(async () => {
@@ -87,12 +99,17 @@ function CompetePage() {
 				key={challenge.challengeId}
 				challenge={challenge}
 				forAllChallenges={true}
+				onExpand={onExpand}
 			/>
 		);
 	});
 	const recentChallengeComponents = myRecentChallenges.map((challenge) => {
 		return (
-			<RecentChallenge key={challenge.challengeId} challenge={challenge} />
+			<RecentChallenge
+				key={challenge.challengeId}
+				challenge={challenge}
+				onExpand={onExpand}
+			/>
 		);
 	});
 	const botComponents = challengableBots.map((bot) => {
@@ -129,6 +146,11 @@ function CompetePage() {
 
 	return (
 		<div className='challengePage'>
+			<ResultsModal
+				displayModal={selectedChallengeData != null}
+				hideModal={hideModal}
+				challengeData={selectedChallengeData}
+			/>
 			<Tooltip id='challenge-page' />
 			<div className='tournamentWrapper'>{tournamentComponents}</div>
 			<div className='challengeSection'>

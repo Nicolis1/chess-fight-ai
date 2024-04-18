@@ -22,4 +22,6 @@ Known bugs:
   - actually integrate the login w/
   - allow challenging more than 1 bot at once (while one is pending)
   - better style bot selection modal
+  - disallow entering the same tournament with more than 1 bot
+  - disallow private bots from joining tournament
 

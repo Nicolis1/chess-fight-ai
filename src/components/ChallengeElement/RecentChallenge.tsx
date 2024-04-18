@@ -3,15 +3,25 @@ import './Challenge.css';
 import { Tournament } from '../../data/api/challenges.ts';
 import { useSelector } from 'react-redux';
 import { ActiveState } from '../../data/stores/dataStore.ts';
-import { Result } from '../ResultsPill/ResultsPill.tsx';
+
+export type ChallengeData = {
+	challenge: Tournament;
+	player1Wins: number;
+	player2Wins: number;
+	draws: number;
+	player1Id: string;
+	player2Id: string;
+};
 
 function RecentChallenge(props: {
 	challenge: Tournament;
 	forAllChallenges?: boolean;
+	onExpand: (challengeData: ChallengeData) => void;
 }) {
 	const activeUser = useSelector(
 		(state: ActiveState) => state.activeUser.value,
 	);
+
 	let opponentName = '';
 	let opponentId = '';
 	let playerName = '';
@@ -66,7 +76,14 @@ function RecentChallenge(props: {
 			key={props.challenge.challengeId}
 			className='recent challenge'
 			onClick={() => {
-				console.log('here');
+				props.onExpand({
+					challenge: props.challenge,
+					player1Id: playerId,
+					player2Id: opponentId,
+					player1Wins: playerWins,
+					player2Wins: oppWins,
+					draws,
+				});
 			}}
 		>
 			<div className={playerClassString}>{playerName}</div>
