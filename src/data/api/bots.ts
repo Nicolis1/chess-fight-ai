@@ -82,6 +82,22 @@ export async function newBot(
 		return null;
 	}
 }
+export async function removeBot(id: string) {
+	const response = await fetch('/bots/delete', {
+		method: 'POST',
+		cache: 'no-cache',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ botid: id }),
+	});
+	// fetch the bots again so cache is ready for when you next open the drawer
+	fetch('/bots/all', {
+		method: 'GET',
+		cache: 'reload',
+	});
+	return response.status == 200;
+}
 export async function fetchBots() {
 	const response = await fetch('/bots/all', {
 		method: 'GET',

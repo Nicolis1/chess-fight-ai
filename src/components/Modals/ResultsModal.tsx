@@ -16,56 +16,48 @@ import { ChallengeData } from '../ChallengeElement/RecentChallenge.tsx';
 import Board from '../board/Board.tsx';
 import { Chess } from 'chess.js';
 
-function ResultsPill(props: { results: Result[]; protagonist: string }) {
-	let wins = 0;
-	let draws = 0;
-	let losses = 0;
-	props.results.forEach((result) => {
-		if (result.winner === props.protagonist) {
-			wins++;
-		} else if (!result.winner) {
-			draws++;
-		} else {
-			losses++;
-		}
-	});
+export function ResultsPill(props: {
+	wins: number;
+	losses: number;
+	draws: number;
+}) {
+	let { wins, losses, draws } = props;
+	let total = wins + losses + draws;
 	return (
 		<div className='pillContainer'>
-			<div className='pillCenterer'>
-				<span
-					className='wins'
-					style={{
-						width: `${(wins / props.results.length) * 100}%`,
-						backgroundColor: 'green',
-						borderTopLeftRadius: '10px',
-						borderBottomLeftRadius: '10px',
-						borderTopRightRadius: losses > 0 || draws > 0 ? '0' : '10px',
-						borderBottomRightRadius: losses > 0 || draws > 0 ? '0' : '10px',
-					}}
-				/>
-				<span
-					className='draws'
-					style={{
-						width: `${(draws / props.results.length) * 100}%`,
-						backgroundColor: 'yellow',
-						borderTopLeftRadius: wins > 0 ? '0' : '10px',
-						borderBottomLeftRadius: wins > 0 ? '0' : '10px',
-						borderTopRightRadius: losses > 0 ? '0' : '10px',
-						borderBottomRightRadius: losses > 0 ? '0' : '10px',
-					}}
-				/>
-				<span
-					className='losses'
-					style={{
-						width: `${(losses / props.results.length) * 100}%`,
-						backgroundColor: 'red',
-						borderTopLeftRadius: wins > 0 || draws > 0 ? '0' : '10px',
-						borderBottomLeftRadius: wins > 0 || draws > 0 ? '0' : '10px',
-						borderTopRightRadius: '10px',
-						borderBottomRightRadius: '10px',
-					}}
-				/>
-			</div>
+			<span
+				className='wins'
+				style={{
+					width: `${(wins / total) * 100}%`,
+					backgroundColor: '#03C04A',
+					borderTopLeftRadius: '10px',
+					borderBottomLeftRadius: '10px',
+					borderTopRightRadius: losses > 0 || draws > 0 ? '0' : '10px',
+					borderBottomRightRadius: losses > 0 || draws > 0 ? '0' : '10px',
+				}}
+			/>
+			<span
+				className='draws'
+				style={{
+					width: `${(draws / total) * 100}%`,
+					backgroundColor: '#DE970B',
+					borderTopLeftRadius: wins > 0 ? '0' : '10px',
+					borderBottomLeftRadius: wins > 0 ? '0' : '10px',
+					borderTopRightRadius: losses > 0 ? '0' : '10px',
+					borderBottomRightRadius: losses > 0 ? '0' : '10px',
+				}}
+			/>
+			<span
+				className='losses'
+				style={{
+					width: `${(losses / total) * 100}%`,
+					backgroundColor: '#C61A09',
+					borderTopLeftRadius: wins > 0 || draws > 0 ? '0' : '10px',
+					borderBottomLeftRadius: wins > 0 || draws > 0 ? '0' : '10px',
+					borderTopRightRadius: '10px',
+					borderBottomRightRadius: '10px',
+				}}
+			/>
 		</div>
 	);
 }
@@ -143,6 +135,17 @@ function ResultsModal(props: {
 		setCurrentMove(-1);
 	}, [intervalID]);
 
+	const getBotNameFromId = useCallback(
+		(id: string) => {
+			if (props.challengeData?.challenge.participants[0].id == id) {
+				return props.challengeData?.challenge.participants[0].name;
+			} else {
+				return props.challengeData?.challenge.participants[1].name;
+			}
+		},
+		[props],
+	);
+
 	if (!props.displayModal) {
 		return null;
 	}
@@ -165,7 +168,14 @@ function ResultsModal(props: {
 				}}
 			>
 				<div className='modalTitle'>
-					<h2>Results</h2>
+					<div className='resultTitle'>
+						<span>Results</span>
+						<ResultsPill
+							wins={props.challengeData.player1Wins}
+							losses={props.challengeData.player2Wins}
+							draws={props.challengeData.draws}
+						/>
+					</div>
 					<button
 						className='close'
 						onClick={() => {
@@ -181,13 +191,18 @@ function ResultsModal(props: {
 							let text = '';
 							let turns = Math.ceil(result.moves.length / 2);
 							if (result.winner) {
-								text = `Won by ${result.winner} in ${turns} turns`;
+								text = `Won by ${getBotNameFromId(
+									result.winner,
+								)} in ${turns} turns`;
 							} else {
 								text = `Draw after ${turns} turns`;
 							}
 							return (
 								<div
 									key={`${index}result`}
+									className={
+										result === selectedResult ? 'selected result' : 'result'
+									}
 									onClick={() => {
 										setSelectedResult(result);
 										if (intervalID) {
@@ -205,34 +220,36 @@ function ResultsModal(props: {
 					</div>
 					<div className='gameVisualization'>
 						{<Board position={displayFen}></Board>}
-						<div className='controlButtons'>
-							<button onClick={backupMove}>
-								<FontAwesomeIcon icon={faChevronLeft} />
-							</button>
-							{intervalID != null ? (
-								<button
-									onClick={() => {
-										clearInterval(intervalID);
-										setIntervalID(null);
-									}}
-								>
-									<FontAwesomeIcon icon={faPause} />
+						{selectedResult && (
+							<div className='controlButtons'>
+								<button onClick={backupMove}>
+									<FontAwesomeIcon icon={faChevronLeft} />
 								</button>
-							) : (
-								<button
-									onClick={(e) => {
-										playRemainingMoves();
-										e.stopPropagation();
-									}}
-								>
-									<FontAwesomeIcon icon={faPlay} />
-								</button>
-							)}
+								{intervalID != null ? (
+									<button
+										onClick={() => {
+											clearInterval(intervalID);
+											setIntervalID(null);
+										}}
+									>
+										<FontAwesomeIcon icon={faPause} />
+									</button>
+								) : (
+									<button
+										onClick={(e) => {
+											playRemainingMoves();
+											e.stopPropagation();
+										}}
+									>
+										<FontAwesomeIcon icon={faPlay} />
+									</button>
+								)}
 
-							<button onClick={playOneMove}>
-								<FontAwesomeIcon icon={faChevronRight} />
-							</button>
-						</div>
+								<button onClick={playOneMove}>
+									<FontAwesomeIcon icon={faChevronRight} />
+								</button>
+							</div>
+						)}
 						<div className='resultsMoves'>
 							{selectedResult?.moves.map((move, index) => {
 								return (

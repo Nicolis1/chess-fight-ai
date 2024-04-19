@@ -16,3 +16,17 @@ export async function fetchActiveUser() {
 		return null;
 	}
 }
+
+export async function deleteAccount() {
+	try {
+		const resp = await fetch('/users/delete', {
+			method: 'DELETE',
+		});
+		if (resp.status === 200) {
+			document.location = '/login';
+		}
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}

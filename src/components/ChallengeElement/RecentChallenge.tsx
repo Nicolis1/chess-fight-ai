@@ -26,6 +26,9 @@ function RecentChallenge(props: {
 	let opponentId = '';
 	let playerName = '';
 	let playerId = '';
+	if (props.challenge.participants.length < 2) {
+		return null;
+	}
 
 	if (props.forAllChallenges) {
 		playerName = props.challenge.participants[0].name;

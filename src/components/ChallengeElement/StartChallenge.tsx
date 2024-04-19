@@ -33,6 +33,7 @@ function StartChallenge(props: {
 					props.onChallenge(selectedBot);
 				}}
 				hideModal={hideSelectionModal}
+				subtitle='Your bot does not need to be public to start a challenge here'
 			/>
 			<BotVisualizationModal
 				botData={botToVisualize}

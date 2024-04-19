@@ -5,7 +5,6 @@ import React from 'react';
 import BotSelectionModal, {
 	ChallengeEvent,
 } from '../Modals/BotSelectionModal.tsx';
-import Button from '../Button/Button.tsx';
 import './TournamentElement.css';
 import BotVisualizationModal from '../Modals/BotVisualizationModal.tsx';
 
@@ -37,6 +36,7 @@ function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 						joinTournament(selectedBot.id, props.challengeId);
 					}}
 					hideModal={hideSelectionModal}
+					subtitle='Bots must be public to enter, and can enter each tournament only once'
 				/>
 				<BotVisualizationModal
 					botData={botToVisualize}
@@ -92,6 +92,8 @@ function TournamentElement(props: Tournament & { eligibleBots: BotData[] }) {
 					setDisplayModal(true);
 				}}
 				className='join'
+				data-tooltip-id='challenge-page'
+				data-tooltip-content='You can enter more than one bot to each tournament!'
 			>
 				Join Now<span className='icon-arrow-right'></span>
 			</button>

@@ -9,7 +9,7 @@ export const activeCodeDataSlice = createSlice({
 	name: 'setActiveCodeData',
 	initialState,
 	reducers: {
-		setActiveCodeData: (state, action: PayloadAction<BotData>) => {
+		setActiveCodeData: (state, action: PayloadAction<BotData | null>) => {
 			state.value = action.payload;
 		},
 	},

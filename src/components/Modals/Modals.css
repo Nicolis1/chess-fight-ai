@@ -29,6 +29,12 @@
     color:#262522;
     height: 50px;
 }
+.modalTitle *{
+    margin:0px
+}
+.modalTitle p{
+    color:grey;
+}
 .modalTitle .close{
     font-size: 2em;
     background-color: inherit;
@@ -60,16 +66,18 @@
     background-color: #8a6241;
 }
 .botToSelect:hover{
-    background-color: #008CD1;
+    background-color: #edebe9;
 }
 .botToSelect.selected{
-    background-color: #008CD1;
+    background-color: #edebe9;
 }
 .botToSelect .viewCode{
     height:100%;
     font-size: .9em;
     font-weight: 600;
     width: fit-content;
+    border: 1px solid black;
+    border-radius: 5px;
 }
 .footerButtons{
     display: flex;
@@ -115,11 +123,6 @@ button.select:hover:disabled{
     width: 100%;
     height: 10px;
     border-radius: 10px;
-}
-.pillCenterer{
-    width: 90%;
-    margin: auto;
-    height: inherit;
     display: flex;
 }
 .wins, .draws, .losses{
@@ -144,14 +147,15 @@ button.select:hover:disabled{
     width: 400px;
 }
 .move{
-    padding: 1px;
+    padding: 2px;
 }
 .move.current{
-    color:red;
+    font-weight: bold;
 }
 .resultsMoves{
     display: flex;
     flex-wrap: wrap;
+    padding-left:8px;
 }
 .resultsContainer .controlButtons{
     width: 100%;
@@ -168,4 +172,31 @@ button.select:hover:disabled{
 }
 .resultsContainer .controlButtons button:hover{
     border-bottom: 1px solid black;
+}
+.modalTitle .resultTitle{
+    width: 50%;
+    font-size: 1.4em;
+    font-weight: bold;
+}
+.results{
+    background-color:#B58863;
+}
+.result{
+    background-color:#B58863;
+    cursor: pointer;
+    padding: 4px;
+    padding-left: 8px;
+    font-weight: 500;
+
+}
+.result:nth-child(even){
+    background-color: #8a6241;
+   
+}
+.result:hover{
+    background-color: #edebe9;
+
+}
+.result.selected{
+    background-color: #edebe9;
 }

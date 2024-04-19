@@ -29,7 +29,7 @@ function CompetePage() {
 	);
 	const [tournaments, setTournaments] = useState<Tournament[]>([]);
 	const [challengableBots, setChallengableBots] = useState<BotData[]>([]);
-	const [myBots, setMyBots] = useState<BotData[]>([]);
+	const [myBots, setMyBots] = useState<BotData[] | null>([]);
 	const [myRecentChallenges, setMyRecentChallenges] = useState<Tournament[]>(
 		[],
 	);
@@ -84,10 +84,13 @@ function CompetePage() {
 
 	const tournamentComponents = tournaments.map(
 		(tournament: Tournament, index) => {
+			const eligibleBots = (myBots || []).filter((bot) => {
+				return bot.challengable;
+			});
 			return (
 				<TournamentElement
 					key={tournament.challengeId}
-					eligibleBots={myBots}
+					eligibleBots={eligibleBots}
 					{...tournament}
 				/>
 			);
@@ -120,7 +123,7 @@ function CompetePage() {
 			<StartChallenge
 				key={bot.id}
 				botData={bot}
-				eligibleBots={myBots}
+				eligibleBots={myBots || []}
 				disabled={!!inFlightChallenges.length}
 				onChallenge={(botForChallenge) => {
 					if (botForChallenge?.id && bot?.id) {

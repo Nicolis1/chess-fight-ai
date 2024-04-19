@@ -92,7 +92,7 @@ def login():
             flash('Logged in successfully.')
             return redirect('/editor')
         else:
-            return parse_json({"error":"bad login"})
+            return redirect('/login/tryagain')
     
     return redirect('/login/tryagain')
 
@@ -160,6 +160,24 @@ def new_user():
         login_user(user)
         flash('created successfully.')
         return redirect('/editor')
+    
+@app.route('/users/delete', methods=['DELETE'])
+@login_required
+def delete_user():
+    user = current_user.get_id()
+    try:
+        deleted_ids = botCollection.find({"owner": user}).distinct("botid")
+        
+        botCollection.delete_many({ "owner":user}).deleted_count
+        userCollection.delete_one({"userid":user})
+        challengesCollection.update_many({"participants": {"$in": deleted_ids}, "type":"tournament"}, {"$pull":{"participants": {"$in": deleted_ids}}})
+        challengesCollection.delete_many({"participants":{"$in": deleted_ids}, "type":"challenge"})
+        logout_user()
+        return parse_json({'success': "account deleted"}), 200
+    
+    except:
+        return parse_json({'error': "failed to delete"}), 400
+
 
 #Bots (maybe should be separate file?)
 @app.route('/bots/new', methods=['POST'])
@@ -202,15 +220,33 @@ def get_bots():
         return response, 200
     return parse_json({'error': "no active user"}), 401
 
+@app.route('/bots/delete', methods=['POST'])
+@login_required
+def delete_bot():
+    bot_data = request.json
+    modified = 0
+    owner = current_user.get_id()
+    try:
+        modified = botCollection.delete_one({"botid":bot_data["botid"], "owner":owner}).deleted_count
+        challengesCollection.update_many({"participants":bot_data["botid"], "type":"tournament"}, {"$pull":{"participants":bot_data["botid"]}})
+        challengesCollection.delete_many({"participants":bot_data["botid"], "type":"challenge"})
+        userCollection.update_one({"userid":owner},{"$pull":{"bots":bot_data["botid"]}})
+        if(modified == 0):
+            return parse_json({'message': "nothing modified"}), 204
+        else:
+            return parse_json({"message": str(modified) +' bots deleted'}), 200
+    except:
+        return parse_json({'error': "missing data"}), 400
+
 @app.route('/bots/update', methods=['POST'])
 @login_required
 def update_bot():
     bot_data = request.json
     modified = 0
-    # todo make sure bot is owned by current user
+    owner = current_user.get_id()
     try:
         if bot_data["name"]!=None and bot_data["code"]!=None:
-            modified = botCollection.update_one({"botid":bot_data["botid"]},{"$set":{"code":bot_data["code"], "name":bot_data["name"]}}).modified_count
+            modified = botCollection.update_one({"botid":bot_data["botid"],"owner":owner},{"$set":{"code":bot_data["code"], "name":bot_data["name"]}}).modified_count
         if(modified == 0):
             return parse_json({'message': "nothing modified"}), 204
         else:
@@ -284,19 +320,12 @@ def new_tourney():
     challengesCollection.insert_one({"type":"tournament","name":data["name"], "match_data":[], "participants":[], "scheduled":data['time'],  "challengeid":challenge_id})
     return parse_json({'message': 'tournament scheduled', 'challengeid': str(challenge_id), 'scheduled':data['time']}), 200
 
-
-@app.route('/challenges/created', methods=['GET'])
-@login_required
-def get_created_challenges():
-    created_challenges = challengesCollection.find({"creator":current_user.get_id()})
-    #todo add logic return a specific amount
-    return parse_json({'challenges':created_challenges}), 200
-
 @app.route('/challenges/tournaments', methods=['GET'])
 def get_existing_tournaments():
+    now = time.time()
     existing_tournaments = challengesCollection.aggregate([
         {
-            "$match": { "type": "tournament" } 
+            "$match": { "type": "tournament",  "scheduled":{ "$gt": (now - 604800) } }
         },
         {
             "$lookup": {
@@ -362,10 +391,17 @@ def join_tournament():
     bot = botCollection.find_one({"botid": bot_id})
     if(bot["owner"] != current_user.get_id()):
         return parse_json({'error':'only the owner of a bot can add it to a tournament'}), 401
+    tournament = challengesCollection.find_one({"challengeid":tournament_to_join})
+    if(tournament["scheduled"] < time.time()):
+        return parse_json({'message':"failed to join, tournament has passed"}), 400
+    if(bot["challengable"] == False):
+        return parse_json({'message':"failed to join, bot must be public to join tournaments"}), 400
+    if(bot_id in tournament["participants"]):
+        return parse_json({'message':"failed to join, bot already registered for this tournamnet"}), 400
 
-    # todo, confirm the tournament is in the future and this bot is eligible to join
-    # todo, prevent the bot from being edited after it has joined the tournament (editible flag, make a copy?)
     challengesCollection.update_one({'challengeid': tournament_to_join}, {'$push':{"participants":bot_id}})
+
+    
     return parse_json({'message':"successfully joined tournament"}), 200
 
 @app.route('/challenges/direct', methods=['POST'])
@@ -375,7 +411,12 @@ def direct_challenge():
     data = request.json
     mybot = botCollection.find_one({"botid":data["botid"]})
     opponentBot = botCollection.find_one({"botid":data["opponentid"] })
-    #todo, verify mybot belongs to current user, opponent bot belongs to someone else, both are available for challenge
+    if(mybot["owner"] != current_user.get_id()):
+        return parse_json({'error':'only the owner of a bot can enter it into challenges'}), 401
+    if(opponentBot["owner"] == current_user.get_id()):
+        return parse_json({'error':'you can not challenge your own bot'}), 401
+    if(opponentBot["challengable"] == False):
+        return parse_json({'error':'opponent\'s bot is not challengable'}), 401
     output = simulate_challenge.run_docker_container( mybot["code"], opponentBot["code"], mybot['botid'],opponentBot["botid"],)
     scheduledTime =time.time()
     challenge_id = uuid4().hex
@@ -390,9 +431,11 @@ def direct_challenge():
 @login_required
 def get_challenges_current_user():
     user_id = current_user.get_id()
+    now = time.time()
+    # matches challenges up to 2 weeks old
     recent_challenges = challengesCollection.aggregate([
         {
-            "$match": { "type": "challenge" } 
+            "$match": { "type": "challenge", "scheduled":{ "$gt": (now - 1209600) }  } 
         },
         {
             "$lookup": {
@@ -452,13 +495,13 @@ def get_challenges_current_user():
         { "$sort" : { "scheduled" : -1 } }
     ])
 
-    #todo add logic to return only upcoming and recently finished challenges
     return parse_json({'challenges':recent_challenges}), 200
 @app.route('/challenges/direct/all', methods=['GET'])
 def get_challenges_all():
+    now = time.time()
     recent_challenges = challengesCollection.aggregate([
         {
-            "$match": { "type": "challenge" } 
+            "$match": { "type": "challenge", "scheduled":{ "$gt": (now - 1209600) } }
         },
         {
             "$lookup": {
@@ -513,7 +556,6 @@ def get_challenges_all():
         { "$sort" : { "scheduled" : -1 } }
     ])
 
-    #todo add logic to return only upcoming and recently finished challenges
     return parse_json({'challenges':recent_challenges}), 200
 
 

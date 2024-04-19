@@ -22,5 +22,5 @@ export function useCodeEditor({ value, onChange, extensions }) {
 		}
 	}, [value, view]);
 
-	return ref;
+	return { ref, view };
 }

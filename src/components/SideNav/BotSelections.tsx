@@ -15,7 +15,7 @@ export default function BotSelections(props) {
 		(state: ActiveState) => state.activeCode.value,
 	);
 
-	const [myBots, setMyBots] = useState<Array<BotData>>([]);
+	const [myBots, setMyBots] = useState<Array<BotData> | null>(null);
 	useEffect(() => {
 		async function getBots() {
 			const botsForState = await fetchBots();
@@ -23,8 +23,11 @@ export default function BotSelections(props) {
 		}
 		getBots();
 	}, [setMyBots]);
-	if (myBots.length === 0) {
+	if (myBots == null) {
 		return <p>Loading...</p>;
+	}
+	if (myBots.length === 0) {
+		return <p>No bots found, click New Bot below to make one</p>;
 	}
 	return (
 		<>
@@ -38,7 +41,6 @@ export default function BotSelections(props) {
 							if (bot.id !== activeCode?.id) dispatch(setActiveCodeData(bot));
 						}}
 						onContextMenu={(e) => {
-							console.log('right clicked');
 							e.preventDefault();
 						}}
 					>

@@ -22,11 +22,12 @@
 .gameVisualization{
     width:300px;
     height: fit-content;
-    border-bottom: 1px solid black;
 }
 .testOutput{
    flex-grow: 100;
    overflow: auto;
+   border: 1px solid black;
+   border-left:none;
 }
 .testOutput .title {
     display: flex;
@@ -90,9 +91,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
-    margin:8px;
     text-align: center;
     font-size: 1em;
+    padding: 2px;
+    margin:0px;
 }
 .editorButtons button{
     background: none;
@@ -108,4 +110,33 @@
 }
 .editor{
     height: 100%;
+}
+
+.controlButtons{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.controlButtons button{
+    padding: 4px;
+    cursor: pointer;
+    background: none;
+    font-size: 1.5em;
+    border: none;
+}
+.controlButtons button:hover{
+    border-bottom: 1px solid black;
+}
+.testOutput  .selected.result{
+    background-color: #edebe9
+}
+.selected.result .moves{
+    font-weight: 400;
+    background-color: #edebe9;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.testOutput .pillContainer{
+    padding-bottom: 4px;
 }

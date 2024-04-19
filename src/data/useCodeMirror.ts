@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { EditorView, basicSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { EditorState } from '@codemirror/state';
 
 export default function useCodeMirror(extensions) {
 	const ref = useRef(null);

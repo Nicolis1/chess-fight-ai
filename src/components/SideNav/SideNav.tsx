@@ -12,6 +12,8 @@ import {
 	faChevronLeft,
 	faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash';
+import { deleteAccount } from '../../data/api/users.ts';
 
 export default function SideNav(props) {
 	const [collapsed, setCollapsed] = useState(true);
@@ -37,6 +39,21 @@ export default function SideNav(props) {
 						<div className='actionButtons'>
 							<NewBot />
 							<SignoutButton withText={true} />
+							<button
+								className='custom-button'
+								onClick={() => {
+									if (
+										confirm(
+											'Are you sure you want to permanently delete your account?',
+										)
+									) {
+										deleteAccount();
+									}
+								}}
+							>
+								Delete Account
+								<FontAwesomeIcon icon={faTrash} />
+							</button>
 						</div>
 					</div>
 				)}

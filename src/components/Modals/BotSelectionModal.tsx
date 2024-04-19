@@ -15,14 +15,12 @@ function BotSelectionModal(props: {
 	displayModal: boolean;
 	hideModal: Function;
 	forEvent: ChallengeEvent;
+	subtitle?: string;
 }) {
-	const [selectedBot, setSelectedBot] = useState<BotData>(props.bots[0]);
+	const [selectedBot, setSelectedBot] = useState<BotData | null>(null);
 	const [botToVisualize, setBotToVisualize] = useState<BotData | null>(null);
 
 	if (!props.displayModal) {
-		return null;
-	}
-	if (!props.bots?.length) {
 		return null;
 	}
 	let title = 'Select Bot';
@@ -36,6 +34,46 @@ function BotSelectionModal(props: {
 			title = 'Select Bot For Tournament';
 			selectButtonText = 'Enter Tournament With ';
 			break;
+	}
+	if (!props.bots?.length) {
+		return (
+			<div
+				className='blurrer'
+				onClick={(e) => {
+					props.hideModal();
+					e.stopPropagation();
+				}}
+			>
+				<div
+					className='modalContainer'
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+				>
+					<div className='modalTitle'>
+						<div>
+							<h2>{title}</h2>
+							<p>{props.subtitle}</p>
+						</div>
+						<button
+							className='close'
+							onClick={() => {
+								props.hideModal();
+							}}
+						>
+							<FontAwesomeIcon icon={faClose} />
+						</button>
+					</div>
+					<div
+						className='botsToSelect'
+						style={{ height: '200px', textAlign: 'center', cursor: 'default' }}
+					>
+						You have no eligible bots to select.{' '}
+						<a href='/editor'>Head to the editor to make one!</a>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	return (
@@ -60,7 +98,10 @@ function BotSelectionModal(props: {
 				}}
 			>
 				<div className='modalTitle'>
-					<h2>{title}</h2>
+					<div>
+						<h2>{title}</h2>
+						<p>{props.subtitle}</p>
+					</div>
 					<button
 						className='close'
 						onClick={() => {
@@ -113,11 +154,12 @@ function BotSelectionModal(props: {
 						onClick={() => {
 							props.hideModal();
 							props.onSelect(selectedBot);
+							setSelectedBot(null);
 						}}
 						className='select'
 					>
 						{`${selectButtonText} ${selectedBot?.name.substring(0, 30) || '?'}${
-							selectedBot?.name.length > 30 ? '...' : ''
+							selectedBot && selectedBot?.name.length > 30 ? '...' : ''
 						}`}
 						<span className='icon-arrow-right' />
 					</button>

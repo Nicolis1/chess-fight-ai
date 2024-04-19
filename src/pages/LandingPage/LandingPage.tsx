@@ -27,7 +27,9 @@ function CreateAccountModalContent() {
 			formData.confirmpassword.length < 3 ||
 			formData.password !== formData.confirmpassword
 		) {
-			setError('Please enter email, username, and password.');
+			setError(
+				'Make sure your passwords match. Also maybe the user name is taken. IDK Good luck',
+			);
 			e.preventDefault();
 			return false;
 		}
@@ -180,7 +182,7 @@ function BackgroundGame() {
 			clearInterval(intervalID);
 		};
 	}, []);
-	return <Board position={fen} />;
+	return <Board position={fen || ''} />;
 }
 
 export default LandingPage;
