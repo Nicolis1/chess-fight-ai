@@ -7,6 +7,7 @@ Known bugs:
 - security issues form packages
 - fetching duplicate data with all chalenges/ my challenges
 - disallow editing public bots
+- edit name tooltip appears below, get cut off
 
 - todo
   - add win counter to bots in DB so it can display on challengers page

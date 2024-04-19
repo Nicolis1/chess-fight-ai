@@ -37,10 +37,11 @@ import BotSelectionModal, {
 	ChallengeEvent,
 } from '../../components/Modals/BotSelectionModal.tsx';
 import { Page, setActivePage } from '../../data/features/activePageSlice.ts';
-import CodeEditor from '../../components/CodeEditor.tsx';
 import { EditorState } from '@codemirror/state';
+import CodeMirror from '@uiw/react-codemirror';
 import { Result } from '../../data/api/challenges.ts';
 import { ResultsPill } from '../../components/Modals/ResultsModal.tsx';
+import { javascript } from '@codemirror/lang-javascript';
 
 function EditorPage() {
 	const activeCodeData = useSelector(
@@ -64,8 +65,28 @@ function EditorPage() {
 	const [intervalID, setIntervalID] = useState<NodeJS.Timeout | null>(null);
 	const [selectedResult, setSelectedResult] = useState<Result | null>(null);
 	const [currentMoveNumber, setCurrentMove] = useState<number>(-1);
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const dispatch = useDispatch();
 
+	useEffect(() => {
+		let listenterToUnload;
+		console.log(hasUnsavedChanges);
+		const unloadHandler = function (event) {
+			listenterToUnload = this;
+			if (hasUnsavedChanges) {
+				event.preventDefault();
+			}
+		};
+		if (hasUnsavedChanges) {
+			window.addEventListener('beforeunload', unloadHandler);
+		} else {
+			window.removeEventListener('beforeunload', unloadHandler);
+		}
+		return () => {
+			window.removeEventListener('beforeunload', unloadHandler);
+		};
+	}, [hasUnsavedChanges]);
 	useEffect(() => {
 		(async () => {
 			dispatch(setActivePage(Page.EDITOR));
@@ -154,13 +175,7 @@ function EditorPage() {
 	}, [intervalID, playOneMove, displayFen, currentMoveNumber, selectedResult]);
 
 	const onChange = (code: string) => {
-		console.log(botData);
-		console.log(botData?.challengable);
-		if (botData?.challengable == true) {
-			alert(
-				'Warning. You can not save edits to public bots. Your changes will be reverted upon reloading',
-			);
-		}
+		setHasUnsavedChanges(true);
 		if (botData?.id) {
 			setBotData({ ...botData, code });
 		}
@@ -180,13 +195,14 @@ function EditorPage() {
 			alert('Nothing to run');
 		}
 	};
-	const submitChanges = async () => {
+	const submitChanges = useCallback(async () => {
 		if (
 			botData &&
 			botData.code != null &&
 			botData.id != null &&
 			botData.name != null
 		) {
+			setSaving(true);
 			fetch('/bots/update', {
 				method: 'POST',
 				headers: {
@@ -197,11 +213,18 @@ function EditorPage() {
 					name: botData.name,
 					code: botData.code,
 				}),
-			});
+			})
+				.then(() => {
+					console.log('here');
+					setHasUnsavedChanges(false);
+				})
+				.finally(() => {
+					setSaving(false);
+				});
 		} else {
 			alert('Nothing to save');
 		}
-	};
+	}, [botData]);
 	const displayBotSelectionModalCallback = useCallback(() => {
 		setDisplaySelectionModal(true);
 		const editor = document.getElementById('editorWrapper');
@@ -216,16 +239,23 @@ function EditorPage() {
 
 	const toggleChallengeable = () => {
 		let updatedState = botData?.challengable !== true;
+		const confirmation =
+			updatedState == true ||
+			confirm(
+				'This will remove you from any tournaments this bot has entered. You can always rejoin later. Would you like to proceed',
+			);
 
-		if (botData?.id) {
+		if (botData && confirmation) {
 			setBotData({ ...botData, challengable: updatedState });
 
-			postBotChallenable(botData?.id, updatedState).then((success) => {
+			postBotChallenable(botData, updatedState).then((success) => {
 				if (success) {
-					dispatch(setActiveCodeData(botData));
+					dispatch(
+						setActiveCodeData({ ...botData, challengable: updatedState }),
+					);
 				} else {
 					// todo better error handling
-					alert('error updating bot visibility');
+					alert('Unable to publish bot, check console for details');
 					setBotData({ ...botData, challengable: !updatedState });
 				}
 			});
@@ -315,6 +345,7 @@ function EditorPage() {
 								<span
 									data-tooltip-content={'Edit name'}
 									data-tooltip-id={'editor-button'}
+									style={{ paddingLeft: '8px' }}
 								>
 									<FontAwesomeIcon icon={faPencil} />
 								</span>
@@ -324,7 +355,12 @@ function EditorPage() {
 									<FontAwesomeIcon icon={faSpinner} />
 								</span>
 							)}
-							{botData?.name}
+							<div className='nameAndSubtitle'>
+								{botData?.name}
+								{botData?.challengable == true && (
+									<span>Public bots cannot be edited</span>
+								)}
+							</div>
 						</div>
 					)}
 
@@ -343,7 +379,13 @@ function EditorPage() {
 							data-tooltip-id={'editor-button'}
 							data-tooltip-content={'Save'}
 						>
-							<FontAwesomeIcon icon={faFloppyDisk} />
+							{saving ? (
+								<span className='spinner'>
+									<FontAwesomeIcon icon={faSpinner} />
+								</span>
+							) : (
+								<FontAwesomeIcon icon={faFloppyDisk} />
+							)}
 						</button>
 						<button
 							className='custom-button'
@@ -395,134 +437,141 @@ function EditorPage() {
 		);
 	}
 	return (
-		<div className='editor-container'>
+		<>
 			<Tooltip id='editor-button' />
-			<SideNav />
-			<div className='editorSection'>
-				<BotSelectionModal
-					onSelect={(selectedBotData) => {
-						if (selectedBotData) {
-							setSelectedTestOpponentData(selectedBotData);
-							getMatchResults(selectedBotData);
-						}
-					}}
-					bots={allBots || []}
-					displayModal={displaySelectionModal}
-					hideModal={hideBotSelectionModalCallback}
-					forEvent={ChallengeEvent.Challenge}
-				></BotSelectionModal>
-				<TitleBar />
-				<div id='editorWrapper'>
-					<CodeEditor
-						value={botData?.code}
-						onChange={onChange}
-						extensions={[]}
-					/>
-				</div>
-			</div>
-			<div className='debugger'>
-				<div className='gameVisualization'>
-					{<Board position={displayFen}></Board>}
-				</div>
-				{selectedResult && (
-					<div className='controlButtons'>
-						<button onClick={backupMove}>
-							<FontAwesomeIcon icon={faChevronLeft} />
-						</button>
-						{intervalID != null ? (
-							<button
-								onClick={() => {
-									clearInterval(intervalID);
-									setIntervalID(null);
-								}}
-							>
-								<FontAwesomeIcon icon={faPause} />
-							</button>
-						) : (
-							<button
-								onClick={(e) => {
-									playRemainingMoves();
-									e.stopPropagation();
-								}}
-							>
-								<FontAwesomeIcon icon={faPlay} />
-							</button>
-						)}
-
-						<button onClick={playOneMove}>
-							<FontAwesomeIcon icon={faChevronRight} />
-						</button>
+			<div className='editor-container'>
+				<SideNav />
+				<div className='editorSection'>
+					<BotSelectionModal
+						onSelect={(selectedBotData) => {
+							if (selectedBotData) {
+								setSelectedTestOpponentData(selectedBotData);
+								getMatchResults(selectedBotData);
+							}
+						}}
+						bots={allBots || []}
+						displayModal={displaySelectionModal}
+						hideModal={hideBotSelectionModalCallback}
+						forEvent={ChallengeEvent.Challenge}
+					></BotSelectionModal>
+					<TitleBar />
+					<div id='editorWrapper'>
+						<CodeMirror
+							value={botData?.code}
+							extensions={[
+								javascript({ jsx: false }),
+								EditorState.readOnly.of(botData?.challengable == true),
+							]}
+							onChange={onChange}
+						/>
 					</div>
-				)}
-				<div className='testOutput'>
-					<div className='title'>
-						<h1 id='opponentBotTitle'>
-							{results ? (
-								<>Test vs. {selectedTestOpponentData?.name}</>
+				</div>
+				<div className='debugger'>
+					<div className='gameVisualization'>
+						{<Board position={displayFen}></Board>}
+					</div>
+					{selectedResult && (
+						<div className='controlButtons'>
+							<button onClick={backupMove}>
+								<FontAwesomeIcon icon={faChevronLeft} />
+							</button>
+							{intervalID != null ? (
+								<button
+									onClick={() => {
+										clearInterval(intervalID);
+										setIntervalID(null);
+									}}
+								>
+									<FontAwesomeIcon icon={faPause} />
+								</button>
 							) : (
-								<>Test results will appear here</>
+								<button
+									onClick={(e) => {
+										playRemainingMoves();
+										e.stopPropagation();
+									}}
+								>
+									<FontAwesomeIcon icon={faPlay} />
+								</button>
 							)}
-						</h1>
-					</div>
-					{calculating && 'calculating'}
-					{results && (
-						<>
-							<ResultsPill wins={wins} losses={losses} draws={draws} />
-							<div className='results'>
-								{results.map((result, index) => {
-									let text = '';
-									let turns = Math.ceil(result.moves.length / 2);
-									if (result.winner) {
-										text = `Won by ${getBotNameFromId(
-											result.winner,
-										)} in ${turns} turns`;
-									} else {
-										text = `Draw after ${turns} turns`;
-									}
-									return (
-										<div
-											key={`${index}result`}
-											className={
-												result === selectedResult ? 'selected result' : 'result'
-											}
-											onClick={() => {
-												setSelectedResult(result);
-												if (intervalID) {
-													clearInterval(intervalID);
-												}
-												let game = new Chess();
-												setDisplayFen(game.fen());
-												setCurrentMove(-1);
-											}}
-										>
-											{text}
-											{result === selectedResult && (
-												<div className='moves'>
-													{result.moves.map((move, index) => {
-														return (
-															<span
-																key={`${move}${index}`}
-																className={
-																	index === currentMoveNumber
-																		? 'move current'
-																		: 'move'
-																}
-															>
-																{move}
-															</span>
-														);
-													})}
-												</div>
-											)}
-										</div>
-									);
-								})}
-							</div>
-						</>
+
+							<button onClick={playOneMove}>
+								<FontAwesomeIcon icon={faChevronRight} />
+							</button>
+						</div>
 					)}
+					<div className='testOutput'>
+						<div className='title'>
+							<h1 id='opponentBotTitle'>
+								{results ? (
+									<>Test vs. {selectedTestOpponentData?.name}</>
+								) : (
+									<>Test results will appear here</>
+								)}
+							</h1>
+						</div>
+						{calculating && 'calculating'}
+						{results && (
+							<>
+								<ResultsPill wins={wins} losses={losses} draws={draws} />
+								<div className='results'>
+									{results.map((result, index) => {
+										let text = '';
+										let turns = Math.ceil(result.moves.length / 2);
+										if (result.winner) {
+											text = `Won by ${getBotNameFromId(
+												result.winner,
+											)} in ${turns} turns`;
+										} else {
+											text = `Draw after ${turns} turns`;
+										}
+										return (
+											<div
+												key={`${index}result`}
+												className={
+													result === selectedResult
+														? 'selected result'
+														: 'result'
+												}
+												onClick={() => {
+													setSelectedResult(result);
+													if (intervalID) {
+														clearInterval(intervalID);
+													}
+													let game = new Chess();
+													setDisplayFen(game.fen());
+													setCurrentMove(-1);
+												}}
+											>
+												{text}
+												{result === selectedResult && (
+													<div className='moves'>
+														{result.moves.map((move, index) => {
+															return (
+																<span
+																	key={`${move}${index}`}
+																	className={
+																		index === currentMoveNumber
+																			? 'move current'
+																			: 'move'
+																	}
+																>
+																	{move}
+																</span>
+															);
+														})}
+													</div>
+												)}
+											</div>
+										);
+									})}
+								</div>
+							</>
+						)}
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }
 

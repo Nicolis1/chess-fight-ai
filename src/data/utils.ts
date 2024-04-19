@@ -100,6 +100,7 @@ export async function simulateGames(
 		}
 		return results;
 	} catch (error) {
+		console.error(new Error('bot failed to run'));
 		console.error(error);
 		return null;
 	}

@@ -83,6 +83,16 @@
 .titleBar .editorButtons *{
     font-size: 24px;
 }
+.titleBar .nameAndSubtitle{
+    display: flex;
+    flex-direction: column;
+    padding-left: 4px;
+}
+.titleBar .nameAndSubtitle span{
+    font-size: .5em;
+    color:grey;
+    font-weight: normal;
+}
 .testOutput .title{
     width: 100%;
 }

@@ -1,3 +1,5 @@
+import { simulateGames } from '../utils.ts';
+
 export type BotData = {
 	id: string;
 	code?: string | undefined;
@@ -7,26 +9,74 @@ export type BotData = {
 };
 
 export async function postBotChallenable(
-	botid: string,
+	bot: BotData,
 	challengable: boolean,
 ): Promise<boolean> {
-	try {
+	if (!challengable) {
 		const resp = await fetch('/bots/update/challenge', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				botid,
+				botid: bot.id,
 				challengable,
 			}),
 		});
 		// todo, what to return if post is successful, but no bots change (204)
 		return resp.status === 200 || resp.status === 204;
-	} catch (error) {
-		console.error(error);
-		return false;
 	}
+	try {
+		if (!bot.code) {
+			console.error(new Error('Submitted bot has no code'));
+			return false;
+		}
+		if (/console/.test(bot.code)) {
+			console.error(
+				new Error(
+					'Submitted bot contains console calls, delete them to submit your bot (commenting them out is not enough)',
+				),
+			);
+			return false;
+		}
+		const maliciousRegex = /(fetch|XMLHttpRequest|axios|jQuery\.ajax)\s*\(/gi;
+		const moreMaliciousRegex =
+			/\b(alert|import|require|confirm|prompt|console\.(log|warn|error))\s*\(/gi;
+
+		if (maliciousRegex.test(bot.code) || moreMaliciousRegex.test(bot.code)) {
+			console.error(
+				new Error(
+					'bot may contain harmful code, revise to remove anything that may appear to be an api reust, or import. This may be a false positive.',
+				),
+			);
+			return false;
+		}
+		try {
+			if ((await simulateGames(bot, bot)) != null) {
+				const resp = await fetch('/bots/update/challenge', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						botid: bot.id,
+						challengable,
+					}),
+				});
+				// todo, what to return if post is successful, but no bots change (204)
+				return resp.status === 200 || resp.status === 204;
+			}
+		} catch (error) {
+			console.error(new Error('bot failed to run'));
+			console.error(error);
+			return false;
+		}
+	} catch (error) {
+		console.error('something unknown went wrong. ');
+		console.error(error);
+	}
+
+	return false;
 }
 
 export async function fetchChallengable(): Promise<BotData[]> {
