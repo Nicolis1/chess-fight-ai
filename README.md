@@ -6,7 +6,6 @@ Known bugs:
   - some improvement made, could likely be better still
 - security issues form packages
 - fetching duplicate data with all chalenges/ my challenges
-- disallow editing public bots
 - edit name tooltip appears below, get cut off
 
 - todo
@@ -17,6 +16,7 @@ Known bugs:
   - make scrollbars less bad looking
   - actually integrate the login w/
   - allow challenging more than 1 bot at once (while one is pending)
-  - warnign messagge about console.logs
   - allow right click actions on buttons, such as duplicate, delete, rename
+
+  - API documentation
 

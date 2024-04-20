@@ -53,6 +53,7 @@ body{
     width: 100%;
     text-align: center;
     color: gray;
+    display: none;
 }
 .signInWithIcons{
     width: 50%;
@@ -61,6 +62,7 @@ body{
     flex-direction: row;
     justify-content: space-between;
     padding: 10px;
+    display: none;
 }
 
 .gameBoard{

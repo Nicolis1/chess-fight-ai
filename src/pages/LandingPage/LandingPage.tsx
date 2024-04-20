@@ -37,7 +37,7 @@ function CreateAccountModalContent() {
 
 	return (
 		<div>
-			<h2>Create Account</h2>
+			<div className='title'>Create Account</div>
 			<div>
 				<form
 					action='/users/new'

@@ -1,10 +1,7 @@
-import json
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
-from pathlib import Path
 import docker
-import asyncio
 
 # dotenv_path = Path('../.env.local')
 
@@ -45,5 +42,6 @@ def run_docker_container(bot1Code, bot2Code, bot1Id, bot2Id ):
     #todo, this is blocking, perhaps will be a perf bottleneck-- 25s response time, very bottleneck
     logs = client.containers.run("fightbots",arg,
                                       cpu_count=1,cpu_rt_period=60000,mem_limit="128m",network_disabled=True,read_only=True)
+    
     return logs
 

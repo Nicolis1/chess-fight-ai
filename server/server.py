@@ -420,6 +420,7 @@ def direct_challenge():
     output = simulate_challenge.run_docker_container( mybot["code"], opponentBot["code"], mybot['botid'],opponentBot["botid"],)
     scheduledTime =time.time()
     challenge_id = uuid4().hex
+    #todo, only add the output if the result was successful
     challengesCollection.insert_one({"type":"challenge", "creator":current_user.get_id(), "match_data":output, "participants":[mybot["botid"],opponentBot["botid"]], "scheduled":scheduledTime,  "challengeid":challenge_id})
     
     #returns result:{output:{}}, maybe simplify?

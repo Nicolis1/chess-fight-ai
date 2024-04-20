@@ -1,4 +1,4 @@
-import { simulateGames } from '../utils.ts';
+import { simulateGamesInBrowser } from '../utils.ts';
 
 export type BotData = {
 	id: string;
@@ -39,6 +39,13 @@ export async function postBotChallenable(
 			);
 			return false;
 		}
+		if (/_chess|_savedState/.test(bot.code)) {
+			console.error(
+				new Error(
+					'It looks like you may be trying to access private variables _chess or _savedState',
+				),
+			);
+		}
 		const maliciousRegex = /(fetch|XMLHttpRequest|axios|jQuery\.ajax)\s*\(/gi;
 		const moreMaliciousRegex =
 			/\b(alert|import|require|confirm|prompt|console\.(log|warn|error))\s*\(/gi;
@@ -52,7 +59,7 @@ export async function postBotChallenable(
 			return false;
 		}
 		try {
-			if ((await simulateGames(bot, bot)) != null) {
+			if ((await simulateGamesInBrowser(bot, bot)) != null) {
 				const resp = await fetch('/bots/update/challenge', {
 					method: 'POST',
 					headers: {

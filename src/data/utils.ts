@@ -1,37 +1,6 @@
 import { Chess } from 'chess.js';
 import { BotData } from './api/bots';
 import { Result } from './api/challenges';
-export const STARTER_CODE1 =
-	//comment for code formatting
-	`function getMove(position){
-	/* edit your code here, 
-	your result must be a string like "a3" that appears
-	in the list of position.moves() */
-	return position.moves()[0];
-}
-return getMove(position);`;
-
-export const STARTER_CODE2 =
-	//comment for code formatting
-	`function getMove(position){
-	/* edit your code here, 
-	your result must be a string like "a3" that appears
-	in the list of position.moves() */
-	let moves = position.moves();
-
-
-	for(let move of moves){
-		position.move(move);
-		let isMate = position.isCheckmate();
-		position.undo();
-		if(isMate){
-			return move;
-		}
-	}
-	let move = moves[Math.floor(Math.random() * moves.length)];
-	return move;
-}
-return getMove(position);`;
 
 export function testBot(position) {
 	let moves = position.moves();
@@ -39,44 +8,79 @@ export function testBot(position) {
 	return move;
 }
 
-type Game = {
-	playerColor: string;
-	board: Chess;
-};
-
-export async function simulateGames(
+export async function simulateGamesInBrowser(
 	botData: BotData | null,
 	opponentData: BotData | null,
 ): Promise<Result[] | null> {
-	const maxMoves = 50;
-	try {
-		const games: Array<Game> = [];
-		for (let i = 0; i < 10; i++) {
-			games.push({
-				playerColor: Math.random() < 0.5 ? 'w' : 'b',
-				board: new Chess(),
+	if (botData?.code != null && opponentData?.code != null) {
+		try {
+			return new Promise((resolve, reject) => {
+				// if not actually necesary (caught by above if), but flow is sad without ti
+				if (!botData.code || !opponentData?.code) {
+					return;
+				}
+				const response = simulateGames(
+					botData.code,
+					opponentData.code,
+					botData.id,
+					opponentData.id,
+					11,
+				);
+				if (response.output.success && response.output.results) {
+					// types are but fightbots is .js so doesn't ahve explicit types
+					resolve(response.output.results);
+				} else {
+					reject(response.output.error);
+				}
 			});
-		}
-		if (botData?.code == null || opponentData?.code == null) {
+		} catch (error) {
+			console.error(new Error('bot failed to run'));
+			console.error(error);
 			return null;
 		}
-		// new Function call's eval on user submitted code, this is potentially dangerous
-		// eslint-disable-next-line no-new-func
-		const decisionFunction = new Function('position', botData.code);
-		const opponentDecisionFunction = opponentData.code
-			? // eslint-disable-next-line no-new-func
-			  new Function('position', opponentData.code)
-			: null;
+	}
+	return null;
+}
 
-		for (let i = 0; i < maxMoves * 2; i++) {
+type Game = {
+	bot1Color: string;
+	board: ChessWrapper;
+	moves: string[];
+};
+const MAX_MOVES = 250;
+function simulateGames(
+	bot1Code: string,
+	bot2Code: string,
+	bot1Id: string,
+	bot2Id: string,
+	gamesToSimulate = 101,
+) {
+	try {
+		const games: Game[] = [];
+		for (let i = 0; i < gamesToSimulate; i++) {
+			games.push({
+				bot1Color: Math.random() < 0.5 ? 'w' : 'b',
+				board: new ChessWrapper(),
+				moves: [],
+			});
+		}
+
+		const decisionFunction = new Function('position', bot1Code);
+		const opponentDecisionFunction = new Function('position', bot2Code);
+		for (let i = 0; i < MAX_MOVES; i++) {
 			for (let game of games) {
-				if (game.board.moveNumber() < 100 && !game.board.isGameOver()) {
-					if (game.board.turn() === game.playerColor) {
-						game.board.move(decisionFunction(game.board));
+				if (game.board.moveNumber() < MAX_MOVES && !game.board.isGameOver()) {
+					const resetState = game.board.fen();
+					if (game.board.turn() === game.bot1Color) {
+						let chosenMove = decisionFunction(game.board);
+						game.board.load(resetState);
+						game.moves.push(chosenMove);
+						game.board.move(chosenMove);
 					} else {
-						if (opponentDecisionFunction) {
-							game.board.move(opponentDecisionFunction(game.board));
-						}
+						let chosenMove = opponentDecisionFunction(game.board);
+						game.board.load(resetState);
+						game.moves.push(chosenMove);
+						game.board.move(chosenMove);
 					}
 				}
 			}
@@ -86,22 +90,116 @@ export async function simulateGames(
 			let winner: string | null = null;
 			if (game.board.isCheckmate()) {
 				// the winner is whoever's turn it isn't on the last turn
-				winner =
-					game.board.turn() === game.playerColor ? opponentData.id : botData.id;
+				winner = game.board.turn() === game.bot1Color ? bot2Id : bot1Id;
 			}
 			results.push({
 				winner,
 				draw: game.board.isDraw(),
 				turns: game.board.moveNumber(),
-				reachedMoveLimit: game.board.moveNumber() > maxMoves,
-				moves: game.board.history(),
-				whitePieces: game.playerColor === 'w' ? botData.id : opponentData.id,
+				reachedMoveLimit: game.board.remainingHalfMoves() < 1,
+				moves: game.moves,
+				whitePieces: game.bot1Color === 'w' ? bot1Id : bot2Id,
 			});
 		}
-		return results;
+		return {
+			output: {
+				success: true,
+				results,
+			},
+		};
 	} catch (error) {
-		console.error(new Error('bot failed to run'));
-		console.error(error);
-		return null;
+		return { output: { success: false, error, bot1Code, bot2Code } };
 	}
+}
+
+class ChessWrapper {
+	#chess: Chess;
+	#savedState: string;
+	constructor(savedState?: string) {
+		if (savedState) {
+			this.#chess = new Chess(savedState);
+			this.#savedState = savedState;
+		} else {
+			this.#chess = new Chess();
+			this.#savedState = this.#chess.fen();
+		}
+	}
+	moves = (options) => {
+		return this.#chess.moves(options);
+	};
+	move = (target) => {
+		return this.#chess.move(target);
+	};
+	board = () => {
+		return this.#chess.board();
+	};
+	fen = () => {
+		return this.#chess.fen();
+	};
+	isGameOver = () => {
+		return this.#chess.isGameOver();
+	};
+	isInsufficientMaterial = () => {
+		return this.#chess.isInsufficientMaterial();
+	};
+	isThreefoldRepetition = () => {
+		return this.#chess.isThreefoldRepetition();
+	};
+	isStalemate = () => {
+		return this.#chess.isStalemate();
+	};
+	isDraw = () => {
+		return this.#chess.isDraw();
+	};
+	getCastlingRights = () => {
+		return this.#chess.getCastlingRights(this.#chess.turn());
+	};
+	getOpponentCastingRights = () => {
+		return this.#chess.getCastlingRights(this.#chess.turn() == 'w' ? 'b' : 'w');
+	};
+	ascii = () => {
+		return this.#chess.ascii();
+	};
+	get = (square) => {
+		return this.#chess.get(square);
+	};
+	isCheck = () => {
+		return this.#chess.isCheck();
+	};
+	inCheck = () => {
+		return this.#chess.inCheck();
+	};
+	isCheckmate = () => {
+		return this.#chess.isCheckmate();
+	};
+	saveState = () => {
+		return (this.#savedState = this.#chess.fen());
+	};
+	getSavedState = () => {
+		return this.#savedState;
+	};
+	reset = () => {
+		return this.#chess.load(this.#savedState);
+	};
+	copy = () => {
+		return new ChessWrapper(this.#chess.fen());
+	};
+	load = (fen) => {
+		return this.#chess.load(fen);
+	};
+	turn = () => {
+		return this.#chess.turn();
+	};
+	undo = () => {
+		return this.#chess.undo();
+	};
+	moveNumber = () => {
+		return this.#chess.moveNumber();
+	};
+	remainingHalfMoves = () => {
+		return MAX_MOVES - this.moveNumber();
+	};
+	history = () => {
+		return this.#chess.history();
+	};
 }

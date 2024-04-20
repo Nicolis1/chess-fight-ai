@@ -3,7 +3,7 @@ import './EditorPage.css';
 import SideNav from '../../components/SideNav/SideNav.tsx';
 import Board from '../../components/board/Board.tsx';
 import { Chess } from 'chess.js';
-import { simulateGames } from '../../data/utils.ts';
+import { simulateGamesInBrowser } from '../../data/utils.ts';
 import { Tooltip } from 'react-tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
@@ -70,10 +70,7 @@ function EditorPage() {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		let listenterToUnload;
-		console.log(hasUnsavedChanges);
 		const unloadHandler = function (event) {
-			listenterToUnload = this;
 			if (hasUnsavedChanges) {
 				event.preventDefault();
 			}
@@ -184,7 +181,7 @@ function EditorPage() {
 	const getMatchResults = (opponent) => {
 		if (botData && botData.code != null) {
 			setCalculating(true);
-			simulateGames(activeCodeData, opponent)
+			simulateGamesInBrowser(activeCodeData, opponent)
 				.then((response) => {
 					setResults(response);
 				})
@@ -215,7 +212,6 @@ function EditorPage() {
 				}),
 			})
 				.then(() => {
-					console.log('here');
 					setHasUnsavedChanges(false);
 				})
 				.finally(() => {
@@ -534,9 +530,14 @@ function EditorPage() {
 														: 'result'
 												}
 												onClick={() => {
-													setSelectedResult(result);
+													if (selectedResult === result) {
+														setSelectedResult(null);
+													} else {
+														setSelectedResult(result);
+													}
 													if (intervalID) {
 														clearInterval(intervalID);
+														setIntervalID(null);
 													}
 													let game = new Chess();
 													setDisplayFen(game.fen());

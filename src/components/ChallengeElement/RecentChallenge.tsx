@@ -50,7 +50,9 @@ function RecentChallenge(props: {
 	let playerWins = 0;
 	let oppWins = 0;
 	let draws = 0;
-
+	if (!props.challenge.matchData) {
+		return null;
+	}
 	for (let result of props.challenge.matchData) {
 		if (result.winner == playerId) {
 			playerWins++;
