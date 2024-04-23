@@ -25,6 +25,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+print(uri)
+print(app.secret_key)
+
 client = MongoClient(uri, server_api=ServerApi('1'))
 db = client['chessfight']
 userCollection = db['users']
