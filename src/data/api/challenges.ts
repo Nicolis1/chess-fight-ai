@@ -88,7 +88,7 @@ export async function joinTournament(botId: string, tournamentId: string) {
 
 export async function fetchChallenges(all = false): Promise<Tournament[]> {
 	try {
-		const url = all ? 'challenges/direct/all' : '/api/challenges/direct';
+		const url = all ? '/api/challenges/direct/all' : '/api/challenges/direct';
 		const resp = await fetch(url, {
 			method: 'GET',
 		});
