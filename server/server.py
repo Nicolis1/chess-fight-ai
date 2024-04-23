@@ -3,7 +3,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from flask_login import LoginManager,UserMixin, login_user, logout_user, login_required, current_user
 from bcrypt import checkpw, hashpw, gensalt
-from bson import ObjectId, json_util
+from bson import json_util
 import os
 from dotenv import load_dotenv
 from pathlib import Path
