@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, flash, redirect, url_for, session
+from flask import Flask, request, jsonify, flash, redirect
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from flask_login import LoginManager,UserMixin, login_user, logout_user, login_required, current_user
@@ -17,7 +17,7 @@ dotenv_path = Path('../.env.local')
 
 load_dotenv(dotenv_path=dotenv_path)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../build', static_url_path='/')
 uri = os.getenv("MONGO_DB_URI")
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -39,8 +39,14 @@ except Exception as e:
     print(e)
 
 @app.route('/')
-def index():
-    return app.send_static_file('../public/index.html')
+@app.route('/compete')
+@app.route('/editor')
+@app.route('/login')
+@app.route('/join')
+@app.route('/login/tryagain')
+def editor():
+    return app.send_static_file('index.html')
+
 
 #user stuff    
 class User(UserMixin):
@@ -79,7 +85,7 @@ def load_user(user_id):
     else:
         return None
 
-@app.route('/login', methods=['POST','GET'])
+@app.route('/api/login', methods=['POST','GET'])
 def login():
     username = request.form['username']
     password = request.form['password']
@@ -96,18 +102,18 @@ def login():
     
     return redirect('/login/tryagain')
 
-@app.route('/logout', methods=['POST'])
+@app.route('/api/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
     return jsonify(**{'result': 200,
                       'data': {'message': 'logout success'}})
     
-@app.route('/test', methods=['POST','GET'])
+@app.route('/api/test', methods=['POST','GET'])
 def test():
     return parse_json(current_user)
 
-@app.route('/user_info', methods=['POST'])
+@app.route('/api/user_info', methods=['POST'])
 @login_required
 def user_info():
     print("\n\n\n",current_user.to_json(),"\n\n\n")
@@ -117,19 +123,19 @@ def user_info():
          return parse_json({'error': 'Item not found'}), 401
 
 #users
-@app.route('/users', methods=['GET'])
+@app.route('/api/users', methods=['GET'])
 def get_all_users():
     users = list(userCollection.find())
     return parse_json(users), 200
 
-@app.route('/users/active', methods=['GET'])
+@app.route('/api/users/active', methods=['GET'])
 def get_active_user():
     if current_user.is_authenticated:
         return parse_json({"username":current_user.username,"userid":current_user.id}), 200
     else:
         return parse_json({"userid": None}), 200
 
-@app.route('/users/<user_id>', methods=['GET'])
+@app.route('/api/users/<user_id>', methods=['GET'])
 def get_item(user_id):
     user_data = userCollection.find_one({'userid': user_id})
     print(user_data)
@@ -139,7 +145,7 @@ def get_item(user_id):
     else: 
         return parse_json({'error': 'Item not found'}), 401
       
-@app.route('/users/new', methods=['POST'])
+@app.route('/api/users/new', methods=['POST'])
 def new_user():
     username = request.form['username']
     password = request.form['password']
@@ -161,7 +167,7 @@ def new_user():
         flash('created successfully.')
         return redirect('/editor')
     
-@app.route('/users/delete', methods=['DELETE'])
+@app.route('/api/users/delete', methods=['DELETE'])
 @login_required
 def delete_user():
     user = current_user.get_id()
@@ -180,7 +186,7 @@ def delete_user():
 
 
 #Bots (maybe should be separate file?)
-@app.route('/bots/new', methods=['POST'])
+@app.route('/api/bots/new', methods=['POST'])
 @login_required
 def new_bot():
     data = request.json
@@ -198,7 +204,7 @@ def new_bot():
         
     return parse_json({'message': 'bot added', 'bot_id': str(bot_id), 'code':data["code"], "name":name, "challengable":False}), 200
 
-@app.route('/bots/all', methods=['GET'])
+@app.route('/api/bots/all', methods=['GET'])
 @login_required
 def get_bots():
     user_id = current_user.get_id()
@@ -220,7 +226,7 @@ def get_bots():
         return response, 200
     return parse_json({'error': "no active user"}), 401
 
-@app.route('/bots/delete', methods=['POST'])
+@app.route('/api/bots/delete', methods=['POST'])
 @login_required
 def delete_bot():
     bot_data = request.json
@@ -238,7 +244,7 @@ def delete_bot():
     except:
         return parse_json({'error': "missing data"}), 400
 
-@app.route('/bots/update', methods=['POST'])
+@app.route('/api/bots/update', methods=['POST'])
 @login_required
 def update_bot():
     bot_data = request.json
@@ -254,7 +260,7 @@ def update_bot():
     except:
         return parse_json({'error': "missing data"}), 400
     
-@app.route('/bots/update/challenge', methods=['POST'])
+@app.route('/api/bots/update/challenge', methods=['POST'])
 @login_required
 def update_bot_challenge():
     data = request.json
@@ -270,7 +276,7 @@ def update_bot_challenge():
     except:
         return parse_json({'error': "missing data"}), 400
     
-@app.route('/bots/challengable', methods=['GET'])
+@app.route('/api/bots/challengable', methods=['GET'])
 def get_challengable():
     user_id = current_user.get_id()
     if(user_id != None):
@@ -308,7 +314,7 @@ def get_challengable():
     
 #Challenges
 # here wwe will build the backend for 1:1 challenges, and tournaments
-@app.route('/challenges/tournaments/new', methods=['POST'])
+@app.route('/api/challenges/tournaments/new', methods=['POST'])
 @login_required
 def new_tourney():
     data = request.json
@@ -320,7 +326,7 @@ def new_tourney():
     challengesCollection.insert_one({"type":"tournament","name":data["name"], "match_data":[], "participants":[], "scheduled":data['time'],  "challengeid":challenge_id})
     return parse_json({'message': 'tournament scheduled', 'challengeid': str(challenge_id), 'scheduled':data['time']}), 200
 
-@app.route('/challenges/tournaments', methods=['GET'])
+@app.route('/api/challenges/tournaments', methods=['GET'])
 def get_existing_tournaments():
     now = time.time()
     existing_tournaments = challengesCollection.aggregate([
@@ -382,7 +388,7 @@ def get_existing_tournaments():
     #todo add logic to return only upcoming and recently finished challenges
     return parse_json({'challenges':existing_tournaments}), 200
 
-@app.route('/challenges/tournaments/join', methods=['POST'])
+@app.route('/api/challenges/tournaments/join', methods=['POST'])
 @login_required
 def join_tournament():
     data = request.json
@@ -404,7 +410,7 @@ def join_tournament():
     
     return parse_json({'message':"successfully joined tournament"}), 200
 
-@app.route('/challenges/direct', methods=['POST'])
+@app.route('/api/challenges/direct', methods=['POST'])
 @login_required
 def direct_challenge():
     # data[botid, opponentbotid]
@@ -428,7 +434,7 @@ def direct_challenge():
     return response, 200
 
 
-@app.route('/challenges/direct', methods=['GET'])
+@app.route('/api/challenges/direct', methods=['GET'])
 @login_required
 def get_challenges_current_user():
     user_id = current_user.get_id()
@@ -497,7 +503,7 @@ def get_challenges_current_user():
     ])
 
     return parse_json({'challenges':recent_challenges}), 200
-@app.route('/challenges/direct/all', methods=['GET'])
+@app.route('/api/challenges/direct/all', methods=['GET'])
 def get_challenges_all():
     now = time.time()
     recent_challenges = challengesCollection.aggregate([

@@ -14,7 +14,7 @@ export default function SignoutButton({ withText }) {
 			className='custom-button'
 			onClick={async () => {
 				try {
-					const resp = await fetch('/logout', {
+					const resp = await fetch('/api/logout', {
 						method: 'POST',
 						mode: 'no-cors',
 					});

@@ -1,6 +1,6 @@
 export async function fetchActiveUser() {
 	try {
-		const resp = await fetch('/users/active', {
+		const resp = await fetch('/api/users/active', {
 			method: 'GET',
 		});
 		const response = JSON.parse(await resp.json());
@@ -19,11 +19,11 @@ export async function fetchActiveUser() {
 
 export async function deleteAccount() {
 	try {
-		const resp = await fetch('/users/delete', {
+		const resp = await fetch('/api/users/delete', {
 			method: 'DELETE',
 		});
 		if (resp.status === 200) {
-			document.location = '/login';
+			document.location = '/api/login';
 		}
 	} catch (error) {
 		console.error(error);

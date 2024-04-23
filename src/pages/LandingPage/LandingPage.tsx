@@ -40,7 +40,7 @@ function CreateAccountModalContent() {
 			<div className='title'>Create Account</div>
 			<div>
 				<form
-					action='/users/new'
+					action='/api/users/new'
 					onSubmit={handleSubmit}
 					className='login-container'
 					method='POST'
@@ -105,7 +105,7 @@ function LoginModalContent(props: { tryagain?: boolean }) {
 		<div>
 			<div className='title'>Login</div>
 			<form
-				action={`/login`}
+				action={`/api/login`}
 				onSubmit={validate}
 				method='POST'
 				className='login-container'

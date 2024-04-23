@@ -200,7 +200,7 @@ function EditorPage() {
 			botData.name != null
 		) {
 			setSaving(true);
-			fetch('/bots/update', {
+			fetch('/api/bots/update', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ export async function postBotChallenable(
 	challengable: boolean,
 ): Promise<boolean> {
 	if (!challengable) {
-		const resp = await fetch('/bots/update/challenge', {
+		const resp = await fetch('/api/bots/update/challenge', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export async function postBotChallenable(
 		}
 		try {
 			if ((await simulateGamesInBrowser(bot, bot)) != null) {
-				const resp = await fetch('/bots/update/challenge', {
+				const resp = await fetch('/api/bots/update/challenge', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export async function postBotChallenable(
 
 export async function fetchChallengable(): Promise<BotData[]> {
 	try {
-		const resp = await fetch('/bots/challengable', {
+		const resp = await fetch('/api/bots/challengable', {
 			method: 'GET',
 		});
 		const availableBots: BotData[] = [];
@@ -114,7 +114,7 @@ export async function newBot(
 	name = '',
 ): Promise<BotData | null> {
 	try {
-		const resp = await fetch('/bots/new', {
+		const resp = await fetch('/api/bots/new', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export async function newBot(
 
 		const response = JSON.parse(await resp.json());
 		// fetch the bots again so cache is ready for when you next open the drawer
-		fetch('/bots/all', {
+		fetch('/api/bots/all', {
 			method: 'GET',
 			cache: 'reload',
 		});
@@ -140,7 +140,7 @@ export async function newBot(
 	}
 }
 export async function removeBot(id: string) {
-	const response = await fetch('/bots/delete', {
+	const response = await fetch('/api/bots/delete', {
 		method: 'POST',
 		cache: 'no-cache',
 		headers: {
@@ -149,14 +149,14 @@ export async function removeBot(id: string) {
 		body: JSON.stringify({ botid: id }),
 	});
 	// fetch the bots again so cache is ready for when you next open the drawer
-	fetch('/bots/all', {
+	fetch('/api/bots/all', {
 		method: 'GET',
 		cache: 'reload',
 	});
 	return response.status == 200;
 }
 export async function fetchBots() {
-	const response = await fetch('/bots/all', {
+	const response = await fetch('/api/bots/all', {
 		method: 'GET',
 		cache: 'no-cache',
 	});

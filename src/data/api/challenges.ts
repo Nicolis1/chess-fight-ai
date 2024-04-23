@@ -21,7 +21,7 @@ export type Result = {
 
 export async function fetchTournaments(): Promise<Tournament[]> {
 	try {
-		const resp = await fetch('/challenges/tournaments', {
+		const resp = await fetch('/api/challenges/tournaments', {
 			method: 'GET',
 		});
 		const tournamentsForReturn: Tournament[] = [];
@@ -52,7 +52,7 @@ export async function fetchTournaments(): Promise<Tournament[]> {
 
 export async function challengeBot(botId: string, opponentBotId: string) {
 	try {
-		const resp = await fetch('/challenges/direct', {
+		const resp = await fetch('/api/challenges/direct', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export async function challengeBot(botId: string, opponentBotId: string) {
 
 export async function joinTournament(botId: string, tournamentId: string) {
 	try {
-		const resp = await fetch('/challenges/tournaments/join', {
+		const resp = await fetch('/api/challenges/tournaments/join', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export async function joinTournament(botId: string, tournamentId: string) {
 
 export async function fetchChallenges(all = false): Promise<Tournament[]> {
 	try {
-		const url = all ? 'challenges/direct/all' : '/challenges/direct';
+		const url = all ? 'challenges/direct/all' : '/api/challenges/direct';
 		const resp = await fetch(url, {
 			method: 'GET',
 		});
