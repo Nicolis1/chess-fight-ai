@@ -10,8 +10,7 @@ from pathlib import Path
 from uuid import uuid4
 import time
 import simulate_challenge
-
-
+import certifi
 
 dotenv_path = Path('../.env.local')
 
@@ -25,10 +24,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-print(uri)
-print(app.secret_key)
+ca = certifi.where()
 
-client = MongoClient(uri, server_api=ServerApi('1'))
+client = MongoClient(uri, server_api=ServerApi('1'), tlsCAFile=ca)
 db = client['chessfight']
 userCollection = db['users']
 botCollection = db['bots']
