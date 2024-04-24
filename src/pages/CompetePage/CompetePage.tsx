@@ -55,6 +55,24 @@ function CompetePage() {
 	useEffect(() => {
 		(async () => {
 			dispatch(setActivePage(Page.CHALLENGES));
+			if (activeUser == null) {
+				fetchActiveUser()
+					.then((activeUserData) => {
+						if (activeUserData) {
+							dispatch(
+								setActiveUser({
+									id: activeUserData.id,
+									username: activeUserData.username,
+								}),
+							);
+						} else {
+							document.location = '/login';
+						}
+					})
+					.catch(() => {
+						document.location = '/login';
+					});
+			}
 
 			const tournaments = fetchTournaments();
 			const challengeable = fetchChallengable();
@@ -66,19 +84,6 @@ function CompetePage() {
 			setMyBots(await myBots);
 			setMyRecentChallenges(await challenges);
 			setAllRecentChallenges(await allChallenges);
-
-			if (activeUser == null) {
-				fetchActiveUser().then((activeUserData) => {
-					if (activeUserData) {
-						dispatch(
-							setActiveUser({
-								id: activeUserData.id,
-								username: activeUserData.username,
-							}),
-						);
-					}
-				});
-			}
 		})();
 	}, [dispatch, inFlightChallenges]);
 

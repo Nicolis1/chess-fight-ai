@@ -129,7 +129,7 @@ button.select:hover:disabled{
     display: block;
     height: 100%;
 }
-.modalContainer.resultsContainer{
+.modalContainer.wide{
     height: 80%;
     max-height: 80%;
     width:800px;
@@ -199,4 +199,14 @@ button.select:hover:disabled{
 }
 .result.selected{
     background-color: #edebe9;
+}
+.apiContent{
+    height: 90%;
+    overflow: auto;
+}
+.apiWrapper ul{
+    list-style: none;
+}
+.apiContent code, .apiWrapper ul{
+    background-color: white;
 }

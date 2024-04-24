@@ -24,6 +24,7 @@ import {
 	faChevronRight,
 	faCopy,
 	faFloppyDisk,
+	faInfoCircle,
 	faKhanda,
 	faPause,
 	faPeace,
@@ -42,6 +43,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { Result } from '../../data/api/challenges.ts';
 import { ResultsPill } from '../../components/Modals/ResultsModal.tsx';
 import { javascript } from '@codemirror/lang-javascript';
+import APIModal from '../../components/Modals/APIModal.tsx';
 
 function EditorPage() {
 	const activeCodeData = useSelector(
@@ -58,7 +60,7 @@ function EditorPage() {
 	const [displaySelectionModal, setDisplaySelectionModal] =
 		useState<boolean>(false);
 	const [allBots, setAllBots] = useState<BotData[] | null>([]);
-
+	const [displayAPIModal, setDisplayAPIModal] = useState(false);
 	const [results, setResults] = useState<Result[] | null>(null);
 	const [calculating, setCalculating] = useState(false);
 	const [displayFen, setDisplayFen] = useState(new Chess().fen());
@@ -87,7 +89,24 @@ function EditorPage() {
 	useEffect(() => {
 		(async () => {
 			dispatch(setActivePage(Page.EDITOR));
-
+			if (activeUser == null) {
+				fetchActiveUser()
+					.then((activeUserData) => {
+						if (!activeUserData) {
+							document.location = '/login';
+						} else {
+							dispatch(
+								setActiveUser({
+									id: activeUserData.id,
+									username: activeUserData.username,
+								}),
+							);
+						}
+					})
+					.catch(() => {
+						document.location = '/login';
+					});
+			}
 			// todo this fetchbots function is called 6 times on editor load, add a debouncer to the api calls.
 			const botsPromise = fetchBots();
 			const bots = await botsPromise;
@@ -98,20 +117,6 @@ function EditorPage() {
 			}
 			if (bots.length > 0) {
 				setAllBots(bots);
-			}
-			if (activeUser == null) {
-				fetchActiveUser().then((activeUserData) => {
-					if (!activeUserData) {
-						document.location = '/login';
-					} else {
-						dispatch(
-							setActiveUser({
-								id: activeUserData.id,
-								username: activeUserData.username,
-							}),
-						);
-					}
-				});
 			}
 		})();
 	}, [dispatch, activeCodeData]);
@@ -363,6 +368,16 @@ function EditorPage() {
 					<div className='editorButtons'>
 						<button
 							className='custom-button'
+							onClick={() => {
+								setDisplayAPIModal(true);
+							}}
+							data-tooltip-id={'editor-button'}
+							data-tooltip-content={'API Help'}
+						>
+							<FontAwesomeIcon icon={faInfoCircle} />
+						</button>
+						<button
+							className='custom-button'
 							onClick={displayBotSelectionModalCallback}
 							data-tooltip-id={'editor-button'}
 							data-tooltip-content={'Run'}
@@ -449,7 +464,13 @@ function EditorPage() {
 						displayModal={displaySelectionModal}
 						hideModal={hideBotSelectionModalCallback}
 						forEvent={ChallengeEvent.Challenge}
-					></BotSelectionModal>
+					/>
+					<APIModal
+						displayModal={displayAPIModal}
+						hideModal={() => {
+							setDisplayAPIModal(false);
+						}}
+					/>
 					<TitleBar />
 					<div id='editorWrapper'>
 						<CodeMirror

@@ -162,7 +162,7 @@ function ResultsModal(props: {
 			}}
 		>
 			<div
-				className='modalContainer resultsContainer'
+				className='modalContainer resultsContainer wide'
 				onClick={(e) => {
 					e.stopPropagation();
 				}}

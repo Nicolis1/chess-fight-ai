@@ -96,7 +96,7 @@ function simulateGames(
 				winner,
 				draw: game.board.isDraw(),
 				turns: game.board.moveNumber(),
-				reachedMoveLimit: game.board.remainingHalfMoves() < 1,
+				reachedMoveLimit: game.board.remainingMoves() < 1,
 				moves: game.moves,
 				whitePieces: game.bot1Color === 'w' ? bot1Id : bot2Id,
 			});
@@ -196,7 +196,7 @@ class ChessWrapper {
 	moveNumber = () => {
 		return this.#chess.moveNumber();
 	};
-	remainingHalfMoves = () => {
+	remainingMoves = () => {
 		return MAX_MOVES - this.moveNumber();
 	};
 	history = () => {

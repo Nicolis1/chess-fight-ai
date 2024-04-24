@@ -80,8 +80,8 @@ function CreateAccountModalContent() {
 }
 function LoginModalContent(props: { tryagain?: boolean }) {
 	const [formData, setFormData] = useState({
-		username: 'ted',
-		password: '123',
+		username: '',
+		password: '',
 	});
 	const [error, setError] = useState(
 		props.tryagain ? 'incorrect username or password' : '',
