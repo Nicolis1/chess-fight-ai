@@ -42,11 +42,12 @@ function App() {
 				</div>
 			),
 		},
+		{ path: '*', element: <LandingPage /> },
 	]);
 
 	return (
 		<>
-			<RouterProvider router={router} />
+			<RouterProvider fallbackElement={<LandingPage />} router={router} />
 		</>
 	);
 }
