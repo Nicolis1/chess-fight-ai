@@ -59,10 +59,13 @@ export async function challengeBot(botId: string, opponentBotId: string) {
 			},
 			body: JSON.stringify({ botid: botId, opponentid: opponentBotId }),
 		});
-		const result = JSON.parse(await resp.json());
-		const jsonResult = JSON.parse(result.result);
-		// todo, output from this api call is too nested
-		return jsonResult.output.results;
+		if (resp.status === 200) {
+			const result = JSON.parse(await resp.json());
+			const jsonResult = JSON.parse(result);
+			// todo, output from this api call is too nested
+			return jsonResult.output.results;
+		}
+		return false;
 	} catch (error) {
 		console.error(error);
 		return [];

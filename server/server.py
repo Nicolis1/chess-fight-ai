@@ -431,6 +431,7 @@ def direct_challenge():
     if(output != False):
         challengesCollection.insert_one({"type":"challenge", "creator":current_user.get_id(), "match_data":output, "participants":[mybot["botid"],opponentBot["botid"]], "scheduled":scheduledTime,  "challengeid":challenge_id})
     else:
+        print("error")
         parse_json({"error":"failed to simulate games, possible issue in bot"}), 500 
     #returns result:{output:{}}, maybe simplify?
     response = parse_json(output)

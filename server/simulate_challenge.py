@@ -51,6 +51,7 @@ def run_docker_container(bot1Code, bot2Code, bot1Id, bot2Id ):
     if result.returncode == 0:
         return result.stdout
     else:
+        print(result.stderr)
         return False
    
 
