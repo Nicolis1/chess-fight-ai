@@ -94,8 +94,7 @@ export async function fetchChallenges(all = false): Promise<Tournament[]> {
 		});
 		const challengesForReturn: Tournament[] = [];
 		for (let tournament of JSON.parse(await resp.json())?.challenges) {
-			const matchData = atob(tournament.match_data.$binary.base64);
-			const parsedMatchData = JSON.parse(matchData).output.results;
+			const parsedMatchData = JSON.parse(tournament.match_data).output.results;
 			challengesForReturn.push({
 				challengeId: tournament.challengeid,
 				matchData: parsedMatchData,
