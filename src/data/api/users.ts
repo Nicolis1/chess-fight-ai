@@ -23,7 +23,7 @@ export async function deleteAccount() {
 			method: 'DELETE',
 		});
 		if (resp.status === 200) {
-			document.location = '/api/login';
+			document.location = '/login';
 		}
 	} catch (error) {
 		console.error(error);

@@ -42,7 +42,9 @@ function APIModal(props: { hideModal: Function; displayModal: boolean }) {
 					</p>
 					<p>
 						Only implement the body of the function, you should not include the
-						function signature ex: instead of ...
+						function signature ex:
+						<br />
+						instead of ...
 						<br />
 						<code>
 							function decideMove(position)&#123;; return position.moves()[0];
