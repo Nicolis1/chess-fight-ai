@@ -464,6 +464,7 @@ function EditorPage() {
 						displayModal={displaySelectionModal}
 						hideModal={hideBotSelectionModalCallback}
 						forEvent={ChallengeEvent.Challenge}
+						subtitle='the bot in your editor will compete against the selected bot'
 					/>
 					<APIModal
 						displayModal={displayAPIModal}

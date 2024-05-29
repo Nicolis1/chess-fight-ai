@@ -8,6 +8,7 @@ import BotVisualizationModal from './BotVisualizationModal.tsx';
 export enum ChallengeEvent {
 	Challenge,
 	Tournament,
+	Test
 }
 function BotSelectionModal(props: {
 	onSelect: Function;
@@ -34,6 +35,13 @@ function BotSelectionModal(props: {
 			title = 'Select Bot For Tournament';
 			selectButtonText = 'Enter Tournament With ';
 			break;
+		case ChallengeEvent.Test:
+			title = 'Select Bot to Test Against';
+			selectButtonText = 'Initiate Test Using ';
+			break;
+		default:
+			title = 'Select Bot';
+			selectButtonText = 'Confirm ';
 	}
 	if (!props.bots?.length) {
 		return (
